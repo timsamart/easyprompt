@@ -7,6 +7,12 @@
 <body>
   <header>
     <h1>PromptHub</h1>
+    <div class="header-actions">
+      <button id="export-btn" class="header-btn" title="Export">Export</button>
+      <button id="import-btn" class="header-btn" title="Import">Import</button>
+      <a href="settings.html" class="header-btn" title="Settings">Settings</a>
+      <input type="file" id="import-file" accept=".json" style="display: none;">
+    </div>
   </header>
   
   <div class="tabs">
@@ -31,7 +37,10 @@
     <div id="chains-list" class="list-container">
       <!-- Chains will be inserted here by JavaScript -->
     </div>
-    <button id="add-chain-btn" class="add-btn">+ Create New Chain</button>
+    <div class="buttons-container">
+      <button id="add-chain-btn" class="add-btn">+ Create New Chain</button>
+      <button id="add-raw-chain-btn" class="add-btn secondary">+ Add Raw Chain</button>
+    </div>
   </div>
   
   <!-- Prompt Form Dialog -->
@@ -92,6 +101,33 @@
           <div class="form-actions">
             <button type="button" class="cancel-btn">Cancel</button>
             <button type="submit" class="save-btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Raw Chain Dialog -->
+  <div id="raw-chain-dialog" class="dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2>Create Chain from Raw Text</h2>
+        <span class="close-btn">&times;</span>
+      </div>
+      <div class="dialog-body">
+        <form id="raw-chain-form">
+          <div class="form-group">
+            <label for="raw-chain-title">Chain Title:</label>
+            <input type="text" id="raw-chain-title" required>
+          </div>
+          <div class="form-group">
+            <label for="raw-content">Paste Multiple Prompts:</label>
+            <p class="help-text">Each prompt should be separated by <code>---</code> on a new line. The first line of each prompt will be used as its title.</p>
+            <textarea id="raw-content" rows="10" required placeholder="Prompt 1 Title&#10;Prompt 1 content...&#10;---&#10;Prompt 2 Title&#10;Prompt 2 content..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Create Chain</button>
           </div>
         </form>
       </div>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PromptHub Settings</title>
+  <link rel="stylesheet" href="panel-styles.css">
+  <style>
+    body {
+      padding: 20px;
+      width: 100%;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .settings-section {
+      margin-bottom: 20px;
+    }
+    .settings-section h2 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .selector-item {
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #f8f9fa;
+    }
+    .selector-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    .add-selector-btn {
+      margin-top: 10px;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .form-col {
+      flex: 1;
+    }
+    .priority-input {
+      width: 60px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #1971c2;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <a href="panel.html" class="back-link">← Back to PromptHub</a>
+  <h1>Domain-Specific Selectors</h1>
+  <p>Configure which elements should receive inserted text for specific domains.</p>
+  
+  <div class="settings-section">
+    <h2>Selector Configurations</h2>
+    <div id="selector-list">
+      <!-- Selector configurations will be listed here -->
+    </div>
+    <button id="add-selector-btn" class="add-btn add-selector-btn">+ Add Domain Configuration</button>
+  </div>
+  
+  <!-- Selector Configuration Dialog -->
+  <div id="selector-dialog" class="dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="selector-dialog-title">Add Domain Configuration</h2>
+        <span class="close-btn">&times;</span>
+      </div>
+      <div class="dialog-body">
+        <form id="selector-form">
+          <input type="hidden" id="selector-id">
+          <div class="form-group">
+            <label for="domain-pattern">Domain Pattern:</label>
+            <input type="text" id="domain-pattern" required placeholder="e.g., *.example.com or chat.openai.com">
+            <p class="help-text">Use * as a wildcard. Examples: *.google.com, chat.openai.com</p>
+          </div>
+          <div class="form-group">
+            <label for="css-selector">CSS Selector:</label>
+            <input type="text" id="css-selector" required placeholder="e.g., textarea, div[contenteditable='true']">
+            <p class="help-text">CSS selector to identify the input element. Multiple selectors can be comma-separated.</p>
+          </div>
+          <div class="form-group">
+            <label for="selector-priority">Priority:</label>
+            <input type="number" id="selector-priority" class="priority-input" min="1" max="100" value="10" required>
+            <p class="help-text">Higher priority configurations will be tried first (1-100).</p>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save Configuration</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <script src="storage.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html> 

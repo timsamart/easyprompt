@@ -27,5 +27,11 @@
     ],
     "side_panel": {
       "default_path": "panel.html"
-    }
+    },
+    "web_accessible_resources": [
+      {
+        "resources": ["settings.html"],
+        "matches": ["<all_urls>"]
+      }
+    ]
   }
