@@ -3,10 +3,6 @@
  */
 document.addEventListener('DOMContentLoaded', async function() {
   // UI Elements
-  const promptsTab = document.getElementById('prompts-tab');
-  const chainsTab = document.getElementById('chains-tab');
-  const promptsContent = document.getElementById('prompts-content');
-  const chainsContent = document.getElementById('chains-content');
   const promptsList = document.getElementById('prompts-list');
   const chainsList = document.getElementById('chains-list');
   const searchInput = document.getElementById('search-input');
@@ -16,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   const exportBtn = document.getElementById('export-btn');
   const importBtn = document.getElementById('import-btn');
   const importFile = document.getElementById('import-file');
+  const refreshBtn = document.getElementById('refresh-btn');
   
   // Dialogs
   const promptDialog = document.getElementById('prompt-dialog');
@@ -27,30 +24,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   const chainForm = document.getElementById('chain-form');
   const rawChainForm = document.getElementById('raw-chain-form');
   
-  // Tab switching
-  promptsTab.addEventListener('click', function() {
-    setActiveTab('prompts');
-  });
-  
-  chainsTab.addEventListener('click', function() {
-    setActiveTab('chains');
-  });
-  
-  function setActiveTab(tabName) {
-    promptsTab.classList.toggle('active', tabName === 'prompts');
-    chainsTab.classList.toggle('active', tabName === 'chains');
-    promptsContent.classList.toggle('active', tabName === 'prompts');
-    chainsContent.classList.toggle('active', tabName === 'chains');
-  }
-  
   // Search functionality
   searchInput.addEventListener('input', function() {
     const query = this.value.trim();
-    if (promptsContent.classList.contains('active')) {
-      loadPrompts(query);
-    } else {
-      loadChains(query);
-    }
+    loadPrompts(query);
+    loadChains(query);
   });
   
   // Close dialogs when clicking on X or outside
@@ -382,7 +360,7 @@ This will add to your existing ${currentPrompts.length} prompts and ${currentCha
   
   // Load initial data
   loadPrompts();
-  setActiveTab('prompts');
+  loadChains();
   
   // Function to load prompts list
   async function loadPrompts(query = '') {
@@ -392,8 +370,15 @@ This will add to your existing ${currentPrompts.length} prompts and ${currentCha
   
   // Function to load chains list
   async function loadChains(query = '') {
-    const chains = await Storage.searchChains(query);
-    renderChainsList(chains);
+    console.log('Loading chains...');
+    try {
+      const chains = await Storage.searchChains(query);
+      console.log('Chains loaded:', chains);
+      renderChainsList(chains);
+    } catch (error) {
+      console.error('Error loading chains:', error);
+      chainsList.innerHTML = '<p class="empty-message">Error loading chains</p>';
+    }
   }
   
   // Function to render prompts list
@@ -549,10 +534,27 @@ This will add to your existing ${currentPrompts.length} prompts and ${currentCha
     if (!prompt) return;
     
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: 'insertText',
-        text: prompt.content
-      });
+      if (!tabs || tabs.length === 0) {
+        showToast('No active tab found');
+        return;
+      }
+      
+      try {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'insertText',
+          text: prompt.content
+        }, response => {
+          if (chrome.runtime.lastError) {
+            console.error('Error sending message:', chrome.runtime.lastError);
+            showToast('Error: Extension not connected to this page');
+            return;
+          }
+          showToast(`Inserted prompt: ${prompt.title}`);
+        });
+      } catch (error) {
+        console.error('Error sending message:', error);
+        showToast('Error: Could not insert prompt');
+      }
     });
   }
   
@@ -568,21 +570,52 @@ This will add to your existing ${currentPrompts.length} prompts and ${currentCha
     if (!prompt) return;
     
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: 'insertText',
-        text: prompt.content
-      });
+      if (!tabs || tabs.length === 0) {
+        showToast('No active tab found');
+        return;
+      }
       
-      // Store chain state for future steps (in a real app, we'd track this)
-      chrome.storage.local.set({
-        currentChain: {
-          id: chain.id,
-          currentStep: 0
-        }
-      });
+      try {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'insertText',
+          text: prompt.content
+        }, response => {
+          if (chrome.runtime.lastError) {
+            console.error('Error sending message:', chrome.runtime.lastError);
+            showToast('Error: Extension not connected to this page');
+            return;
+          }
+          
+          // Store chain state for future steps (in a real app, we'd track this)
+          chrome.storage.local.set({
+            currentChain: {
+              id: chain.id,
+              currentStep: 0
+            }
+          });
+          
+          showToast(`Inserted chain: ${chain.title}`);
+        });
+      } catch (error) {
+        console.error('Error sending message:', error);
+        showToast('Error: Could not insert chain');
+      }
     });
   }
   
+  // Function to show toast notifications
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'success-message';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Remove after 2 seconds
+    setTimeout(() => {
+      document.body.removeChild(toast);
+    }, 2000);
+  }
+
   // Function to insert a specific step from a chain
   async function insertChainStep(chainId, stepIndex) {
     try {
@@ -611,13 +644,30 @@ This will add to your existing ${currentPrompts.length} prompts and ${currentCha
         return;
       }
       
-      // Insert the prompt
-      vscode.postMessage({
-        command: 'insertText',
-        text: prompt.content
+      // Insert the prompt using Chrome messaging
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        if (!tabs || tabs.length === 0) {
+          showToast('No active tab found');
+          return;
+        }
+        
+        try {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            action: 'insertText',
+            text: prompt.content
+          }, response => {
+            if (chrome.runtime.lastError) {
+              console.error('Error sending message:', chrome.runtime.lastError);
+              showToast('Error: Extension not connected to this page');
+              return;
+            }
+            showToast(`Inserted step ${stepIndex + 1}: ${prompt.title}`);
+          });
+        } catch (error) {
+          console.error('Error sending message:', error);
+          showToast('Error: Could not insert step');
+        }
       });
-      
-      showToast(`Inserted step ${stepIndex + 1}: ${prompt.title}`);
     } catch (error) {
       console.error('Error inserting chain step:', error);
       showToast('Error inserting chain step');
@@ -910,4 +960,11 @@ This will add to your existing ${currentPrompts.length} prompts and ${currentCha
       });
     }
   }
+
+  // Add refresh button click handler
+  refreshBtn.addEventListener('click', function() {
+    loadPrompts();
+    loadChains();
+    showToast('Data refreshed');
+  });
 }); 

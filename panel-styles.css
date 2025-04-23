@@ -11,6 +11,7 @@ body {
   overflow-y: hidden;
   display: flex;
   flex-direction: column;
+  background-color: #f8f9fa;
 }
 
 header {
@@ -43,6 +44,7 @@ h1 {
   font-size: 12px;
   cursor: pointer;
   transition: background-color 0.2s;
+  font-family: Arial, sans-serif;
 }
 
 .header-btn:hover {
@@ -103,60 +105,52 @@ code {
   color: #495057;
 }
 
-.tabs {
-  display: flex;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-  flex-shrink: 0;
-}
-
-.tab {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.tab.active {
-  background-color: #e7f5ff;
-  color: #1971c2;
-  border-radius: 5px 5px 0 0;
-}
-
-#search-container {
-  padding: 10px;
-  background-color: white;
-  flex-shrink: 0;
-}
-
-#search-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  font-size: 12px;
-}
-
-.tab-content {
-  display: none;
-  padding: 10px;
+/* Content container and list styling */
+.content-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  gap: 15px; /* Space between sections */
 }
 
-.tab-content.active {
+.section {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.section-title {
+  font-size: 16px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dee2e6;
+  color: #343a40;
+  font-weight: 600;
+}
+
+/* Remove the old tab styles */
+.tabs {
+  display: none;
+}
+
+.tab-content {
   display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin-bottom: 15px;
 }
 
 .list-container {
   border: 1px solid #dee2e6;
   border-radius: 5px;
   margin-bottom: 10px;
-  flex: 1;
+  background-color: #ffffff;
+  max-height: 300px; /* Limit height to prevent single section from taking too much space */
   overflow-y: auto;
 }
 
@@ -561,4 +555,43 @@ code {
 
 .drag-handle:hover {
   color: #6c757d;
+}
+
+/* Fix search bar styling */
+#search-container {
+  padding: 10px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+  z-index: 10;
+}
+
+#search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 13px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: #7950f2;
+  box-shadow: 0 0 0 2px rgba(121, 80, 242, 0.25);
+}
+
+/* Special styling for the refresh button with a proper refresh icon */
+#refresh-btn::before {
+  content: "\21BB"; /* Unicode for the refresh symbol */
+  display: inline-block;
+  font-size: 14px;
+}
+
+/* Hide the text content of refresh button */
+#refresh-btn {
+  font-size: 0;
+}
+
+#refresh-btn::before {
+  font-size: 14px;
 } 

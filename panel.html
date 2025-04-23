@@ -8,6 +8,7 @@
   <header>
     <h1>PromptHub</h1>
     <div class="header-actions">
+      <button id="refresh-btn" class="header-btn" title="Refresh">Refresh</button>
       <button id="export-btn" class="header-btn" title="Export">Export</button>
       <button id="import-btn" class="header-btn" title="Import">Import</button>
       <a href="settings.html" class="header-btn" title="Settings">Settings</a>
@@ -15,31 +16,31 @@
     </div>
   </header>
   
-  <div class="tabs">
-    <button id="prompts-tab" class="tab active">Prompts</button>
-    <button id="chains-tab" class="tab">Chains</button>
-  </div>
-  
   <div id="search-container">
     <input type="text" id="search-input" placeholder="Search...">
   </div>
   
-  <!-- Prompts Tab Content -->
-  <div id="prompts-content" class="tab-content active">
-    <div id="prompts-list" class="list-container">
-      <!-- Prompts will be inserted here by JavaScript -->
+  <!-- Main Content Container -->
+  <div class="content-container">
+    <!-- Prompts Section -->
+    <div class="section">
+      <h2 class="section-title">Prompts</h2>
+      <div id="prompts-list" class="list-container">
+        <!-- Prompts will be inserted here by JavaScript -->
+      </div>
+      <button id="add-prompt-btn" class="add-btn">+ Add New Prompt</button>
     </div>
-    <button id="add-prompt-btn" class="add-btn">+ Add New Prompt</button>
-  </div>
-  
-  <!-- Chains Tab Content -->
-  <div id="chains-content" class="tab-content">
-    <div id="chains-list" class="list-container">
-      <!-- Chains will be inserted here by JavaScript -->
-    </div>
-    <div class="buttons-container">
-      <button id="add-chain-btn" class="add-btn">+ Create New Chain</button>
-      <button id="add-raw-chain-btn" class="add-btn secondary">+ Add Raw Chain</button>
+    
+    <!-- Chains Section -->
+    <div class="section">
+      <h2 class="section-title">Chains</h2>
+      <div id="chains-list" class="list-container">
+        <!-- Chains will be inserted here by JavaScript -->
+      </div>
+      <div class="buttons-container">
+        <button id="add-chain-btn" class="add-btn">+ Create New Chain</button>
+        <button id="add-raw-chain-btn" class="add-btn secondary">+ Add Raw Chain</button>
+      </div>
     </div>
   </div>
   
