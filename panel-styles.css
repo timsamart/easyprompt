@@ -1,0 +1,303 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  width: 100%;
+  height: 100vh;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: #7950f2;
+  color: white;
+  padding: 12px 15px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.tabs {
+  display: flex;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tab.active {
+  background-color: #e7f5ff;
+  color: #1971c2;
+  border-radius: 5px 5px 0 0;
+}
+
+#search-container {
+  padding: 10px;
+  background-color: white;
+  flex-shrink: 0;
+}
+
+#search-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.tab-content {
+  display: none;
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+.list-container {
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.list-item {
+  padding: 10px;
+  margin: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+}
+
+.list-item-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: #495057;
+  margin-bottom: 5px;
+}
+
+.list-item-desc {
+  font-size: 12px;
+  color: #868e96;
+  margin-bottom: 5px;
+}
+
+.list-item-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  margin-left: 5px;
+  padding: 3px 8px;
+  font-size: 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.insert-btn {
+  background-color: #e7f5ff;
+  color: #1971c2;
+}
+
+.edit-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
+
+.delete-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #7950f2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.dialog {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.dialog-content {
+  background-color: white;
+  margin: 5% auto;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-header {
+  padding: 12px 15px;
+  background-color: #7950f2;
+  color: white;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+
+.dialog-header h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.close-btn {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.dialog-body {
+  padding: 15px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding: 10px 0;
+}
+
+.form-actions button {
+  padding: 8px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #495057;
+}
+
+.save-btn {
+  background-color: #7950f2;
+  border: none;
+  color: white;
+}
+
+#chain-steps {
+  margin: 10px 0;
+  min-height: 50px;
+  border: 1px dashed #ced4da;
+  border-radius: 5px;
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.chain-step {
+  padding: 8px;
+  margin: 5px 0;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-selector {
+  display: flex;
+  gap: 5px;
+}
+
+.step-selector select {
+  flex-grow: 1;
+}
+
+.step-selector button {
+  padding: 5px 10px;
+  background-color: #e7f5ff;
+  color: #1971c2;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.empty-message {
+  color: #adb5bd;
+  text-align: center;
+  padding: 10px;
+}
+
+.remove-step {
+  cursor: pointer;
+  color: #868e96;
+}
+
+.remove-step:hover {
+  color: #fa5252;
+} 

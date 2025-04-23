@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PromptHub</title>
+  <link rel="stylesheet" href="panel-styles.css">
+</head>
+<body>
+  <header>
+    <h1>PromptHub</h1>
+  </header>
+  
+  <div class="tabs">
+    <button id="prompts-tab" class="tab active">Prompts</button>
+    <button id="chains-tab" class="tab">Chains</button>
+  </div>
+  
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search...">
+  </div>
+  
+  <!-- Prompts Tab Content -->
+  <div id="prompts-content" class="tab-content active">
+    <div id="prompts-list" class="list-container">
+      <!-- Prompts will be inserted here by JavaScript -->
+    </div>
+    <button id="add-prompt-btn" class="add-btn">+ Add New Prompt</button>
+  </div>
+  
+  <!-- Chains Tab Content -->
+  <div id="chains-content" class="tab-content">
+    <div id="chains-list" class="list-container">
+      <!-- Chains will be inserted here by JavaScript -->
+    </div>
+    <button id="add-chain-btn" class="add-btn">+ Create New Chain</button>
+  </div>
+  
+  <!-- Prompt Form Dialog -->
+  <div id="prompt-dialog" class="dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="prompt-dialog-title">Add New Prompt</h2>
+        <span class="close-btn">&times;</span>
+      </div>
+      <div class="dialog-body">
+        <form id="prompt-form">
+          <input type="hidden" id="prompt-id">
+          <div class="form-group">
+            <label for="prompt-title">Prompt Title:</label>
+            <input type="text" id="prompt-title" required>
+          </div>
+          <div class="form-group">
+            <label for="prompt-content">Prompt Text:</label>
+            <textarea id="prompt-content" rows="6" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chain Form Dialog -->
+  <div id="chain-dialog" class="dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="chain-dialog-title">Create New Chain</h2>
+        <span class="close-btn">&times;</span>
+      </div>
+      <div class="dialog-body">
+        <form id="chain-form">
+          <input type="hidden" id="chain-id">
+          <div class="form-group">
+            <label for="chain-title">Chain Title:</label>
+            <input type="text" id="chain-title" required>
+          </div>
+          <div class="form-group">
+            <label>Chain Steps:</label>
+            <div id="chain-steps">
+              <!-- Step selection will be added here -->
+              <p class="empty-message">No steps added yet</p>
+            </div>
+            <div class="step-selector">
+              <select id="prompt-selector">
+                <option value="">Select a prompt to add...</option>
+                <!-- Options will be added by JavaScript -->
+              </select>
+              <button type="button" id="add-step-btn">Add</button>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <script src="storage.js"></script>
+  <script src="panel.js"></script>
+</body>
+</html> 
