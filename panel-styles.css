@@ -89,13 +89,11 @@ h1 {
 }
 
 h1::before {
-  content: "P";
-  font-size: 24px;
+  content: "PH";
+  font-size: 14px;
   font-weight: bold;
-  background: linear-gradient(45deg, rgba(255,255,255,0.9), rgba(224,231,255,0.8));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: rgba(255,255,255,0.2);
+  color: white;
   padding: var(--spacing-xs);
   border: 2px solid rgba(255,255,255,0.3);
   border-radius: var(--radius-sm);
@@ -104,6 +102,7 @@ h1::before {
   justify-content: center;
   width: 32px;
   height: 32px;
+  line-height: 1;
 }
 
 .header-actions {
@@ -260,18 +259,21 @@ h1::before {
 }
 
 .section-title::before {
-  content: "●";
-  font-size: 18px;
-  color: var(--primary-color);
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  flex-shrink: 0;
 }
 
 .section:last-child .section-title::before {
-  content: "⧉";
-  color: var(--primary-color);
+  content: "";
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--primary-color);
+  border-radius: 2px;
+  background: transparent;
 }
 
 .list-container {
@@ -426,10 +428,10 @@ h1::before {
 }
 
 .insert-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
   color: white;
-  border-color: var(--primary-color);
-  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .insert-btn:hover {
@@ -439,10 +441,10 @@ h1::before {
 }
 
 .copy-btn {
-  background: linear-gradient(135deg, var(--success-color), var(--success-hover));
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
   color: white;
-  border-color: var(--success-color);
-  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .copy-btn:hover {
@@ -452,10 +454,10 @@ h1::before {
 }
 
 .edit-btn {
-  background: linear-gradient(135deg, var(--warning-color), var(--warning-hover));
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
   color: white;
-  border-color: var(--warning-color);
-  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .edit-btn:hover {
@@ -465,10 +467,10 @@ h1::before {
 }
 
 .delete-btn {
-  background: linear-gradient(135deg, var(--error-color), var(--error-hover));
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: none;
   color: white;
-  border-color: var(--error-color);
-  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .delete-btn:hover {
@@ -775,9 +777,9 @@ h1::before {
 }
 
 #refresh-btn::before {
-  content: "↻";
-  margin-right: var(--spacing-xs);
-  font-size: 14px;
+  content: "Refresh";
+  margin-right: 0;
+  font-size: 13px;
 }
 
 /* Toast/Message Notifications */
@@ -1240,4 +1242,113 @@ select:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Button visual indicators using CSS */
+.insert-btn::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid currentColor;
+  margin-right: var(--spacing-xs);
+  opacity: 0.8;
+}
+
+.copy-btn::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: 1px;
+  margin-right: var(--spacing-xs);
+  position: relative;
+  opacity: 0.8;
+}
+
+.copy-btn::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: 1px;
+  top: -2px;
+  left: 2px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.edit-btn::before {
+  content: "";
+  width: 2px;
+  height: 8px;
+  background: currentColor;
+  margin-right: var(--spacing-xs);
+  transform: rotate(45deg);
+  border-radius: 1px;
+  opacity: 0.8;
+}
+
+.delete-btn::before {
+  content: "";
+  width: 8px;
+  height: 2px;
+  background: currentColor;
+  margin-right: var(--spacing-xs);
+  border-radius: 1px;
+  opacity: 0.8;
+}
+
+.step-insert-btn::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 5px solid currentColor;
+  margin-right: var(--spacing-xs);
+  opacity: 0.8;
+}
+
+/* Enhanced button text styling */
+.action-btn {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.btn-text {
+  position: relative;
+}
+
+/* Different button styles for better recognition */
+.insert-btn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.copy-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: none;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 } 
