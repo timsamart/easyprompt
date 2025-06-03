@@ -465,16 +465,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     const actions = SecurityUtils.createSafeElement('div', '', 'list-item-actions');
     
     // Insert button
-    const insertBtn = createActionButton('Insert', 'insert-btn', '📥', () => insertPrompt(prompt.id));
+    const insertBtn = createActionButton('Insert', 'insert-btn', '↓', () => insertPrompt(prompt.id));
     
     // Copy button
-    const copyBtn = createActionButton('Copy', 'copy-btn', '📋', () => copyToClipboard(prompt.content, 'Prompt'));
+    const copyBtn = createActionButton('Copy', 'copy-btn', '⧉', () => copyToClipboard(prompt.content, 'Prompt'));
     
     // Edit button
-    const editBtn = createActionButton('Edit', 'edit-btn', '✏️', () => editPrompt(prompt.id));
+    const editBtn = createActionButton('Edit', 'edit-btn', '✎', () => editPrompt(prompt.id));
     
     // Delete button
-    const deleteBtn = createActionButton('Delete', 'delete-btn', '🗑️', () => deletePrompt(prompt.id));
+    const deleteBtn = createActionButton('Delete', 'delete-btn', '×', () => deletePrompt(prompt.id));
     
     // Assemble element
     actions.appendChild(insertBtn);
@@ -535,16 +535,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     const actions = SecurityUtils.createSafeElement('div', '', 'list-item-actions');
     
     // Insert button (starts the chain)
-    const insertBtn = createActionButton('Start', 'insert-btn', '▶️', () => insertChain(chain.id));
+    const insertBtn = createActionButton('Start', 'insert-btn', '▶', () => insertChain(chain.id));
     
     // Copy button (copies all chain content)
-    const copyBtn = createActionButton('Copy All', 'copy-btn', '📋', () => copyChainContent(chain, promptsMap));
+    const copyBtn = createActionButton('Copy All', 'copy-btn', '⧉', () => copyChainContent(chain, promptsMap));
     
     // Edit button
-    const editBtn = createActionButton('Edit', 'edit-btn', '✏️', () => editChain(chain.id));
+    const editBtn = createActionButton('Edit', 'edit-btn', '✎', () => editChain(chain.id));
     
     // Delete button
-    const deleteBtn = createActionButton('Delete', 'delete-btn', '🗑️', () => deleteChain(chain.id));
+    const deleteBtn = createActionButton('Delete', 'delete-btn', '×', () => deleteChain(chain.id));
     
     actions.appendChild(insertBtn);
     actions.appendChild(copyBtn);
@@ -587,8 +587,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Action buttons container
     const stepActions = SecurityUtils.createSafeElement('div', '', 'step-actions');
     
-    const insertStepBtn = createActionButton('Insert', 'step-insert-btn', '📥', () => insertChainStep(chainId, stepIndex));
-    const copyStepBtn = createActionButton('Copy', 'step-insert-btn', '📋', () => copyToClipboard(prompt.content, 'Step'));
+    const insertStepBtn = createActionButton('Insert', 'step-insert-btn', '↓', () => insertChainStep(chainId, stepIndex));
+    const copyStepBtn = createActionButton('Copy', 'step-insert-btn', '⧉', () => copyToClipboard(prompt.content, 'Step'));
     
     stepActions.appendChild(insertStepBtn);
     stepActions.appendChild(copyStepBtn);
