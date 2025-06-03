@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-03T19:57:06.782Z",
+  "timestamp": "2025-06-03T21:08:15.177Z",
   "environment": "WSL",
   "featherLoaded": true,
   "iconElementsFound": 0,
@@ -7,7 +7,7 @@
   "iconRenderingInfo": [],
   "layoutInfo": {
     "containerExists": true,
-    "cardCount": 0,
+    "cardCount": 6,
     "headerHeight": 77,
     "containerDisplay": "grid",
     "gridColumns": "368px 368px 368px",
@@ -16,10 +16,7 @@
     "headerBackgroundColor": "rgba(0, 0, 0, 0) linear-gradient(135deg, rgb(99, 102, 241) 0%, rgb(79, 70, 229) 100%) repeat scroll 0% 0% / auto padding-box border-box"
   },
   "consoleLogs": [
-    "[log] ðŸ”§ Chrome APIs not available - using mock data for testing",
-    "[error] [PromptHub Error - Render All Items]: JSHandle@error",
-    "[error] [PromptHub Error - Render All Items]: JSHandle@error",
-    "[error] [PromptHub Error - Render All Items]: JSHandle@error"
+    "[log] ðŸ”§ Chrome APIs not available - using mock data for testing"
   ],
   "errors": [],
   "failedRequests": []
