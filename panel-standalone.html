@@ -294,11 +294,21 @@
       }, 5000);
     }
 
-    // Generate random icon class for prompts
-    function getRandomPromptIcon() {
-      const iconCount = 10;
-      const randomNum = Math.floor(Math.random() * iconCount) + 1;
-      return `prompt-icon-${randomNum}`;
+    // Generate deterministic icon class based on content (like Gravatar)
+    function getPromptIcon(title, content = '') {
+      // Create a simple hash from title and content
+      const text = (title + content).toLowerCase();
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+        const char = text.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      
+      // Convert to positive number and get icon number (1-12)
+      const iconCount = 12;
+      const iconNum = (Math.abs(hash) % iconCount) + 1;
+      return `prompt-icon-${iconNum}`;
     }
 
     // Initialize Feather icons
@@ -313,7 +323,7 @@
       const card = createSafeElement('div', '', 'card prompt-card');
       card.dataset.id = prompt.id;
       
-      const iconClass = getRandomPromptIcon();
+      const iconClass = getPromptIcon(prompt.title, prompt.content);
       
       card.innerHTML = `
         <div class="card-header">

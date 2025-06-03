@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptHub - CSS Avatar Demo</title>
+  <link rel="stylesheet" href="panel-styles.css">
+  <style>
+    body {
+      padding: 2rem;
+      background: var(--background-color);
+    }
+    
+    .avatar-demo {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .avatar-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--surface-color);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+    }
+    
+    .demo-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary-light), #e0e7ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-color);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      box-shadow: var(--shadow-xs);
+      position: relative;
+    }
+    
+    .avatar-label {
+      font-size: var(--small-font-size);
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    
+    h1 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    
+    .pattern-info {
+      background: var(--surface-color);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      margin-top: 2rem;
+    }
+    
+    .pattern-info h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .pattern-info ul {
+      color: var(--text-secondary);
+      margin-left: 1.5rem;
+    }
+    
+    .pattern-info li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PromptHub CSS-Generated Avatars</h1>
+    <p>
+      These avatars are generated using pure CSS patterns, similar to Gravatar. 
+      Each pattern is deterministically generated based on the prompt content, 
+      ensuring the same prompt always gets the same icon.
+    </p>
+    
+    <div class="avatar-demo">
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-1"></div>
+        <div class="avatar-label">Pattern 1<br>Diagonal Stripes</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-2"></div>
+        <div class="avatar-label">Pattern 2<br>Radial Gradient</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-3"></div>
+        <div class="avatar-label">Pattern 3<br>Conic Gradient</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-4"></div>
+        <div class="avatar-label">Pattern 4<br>Diamond Shape</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-5"></div>
+        <div class="avatar-label">Pattern 5<br>Repeating Lines</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-6"></div>
+        <div class="avatar-label">Pattern 6<br>Multiple Circles</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-7"></div>
+        <div class="avatar-label">Pattern 7<br>Cross Pattern</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-8"></div>
+        <div class="avatar-label">Pattern 8<br>Warm Conic</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-9"></div>
+        <div class="avatar-label">Pattern 9<br>Four Dots</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-10"></div>
+        <div class="avatar-label">Pattern 10<br>Plus Sign</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-11"></div>
+        <div class="avatar-label">Pattern 11<br>Flower Pattern</div>
+      </div>
+      
+      <div class="avatar-item">
+        <div class="demo-icon prompt-icon-12"></div>
+        <div class="avatar-label">Pattern 12<br>Mixed Gradients</div>
+      </div>
+    </div>
+    
+    <div class="pattern-info">
+      <h3>How It Works</h3>
+      <ul>
+        <li><strong>Deterministic:</strong> Same content always generates the same avatar</li>
+        <li><strong>Hash-based:</strong> Uses a simple hash function on title + content</li>
+        <li><strong>CSS-only:</strong> No external dependencies or image files needed</li>
+        <li><strong>Scalable:</strong> Works at any size and resolution</li>
+        <li><strong>Consistent:</strong> Looks the same across all browsers and devices</li>
+        <li><strong>Performance:</strong> Rendered using pure CSS gradients and patterns</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html> 
