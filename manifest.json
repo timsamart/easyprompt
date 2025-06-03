@@ -4,9 +4,6 @@
     "version": "1.0.0",
     "description": "Save and insert prompts and prompt chains at your cursor position",
     "permissions": ["storage", "activeTab", "contextMenus", "sidePanel"],
-    "content_security_policy": {
-      "extension_pages": "script-src 'self' https://unpkg.com; object-src 'self'"
-    },
     "action": {
       "default_icon": {
         "16": "icons/icon16.png",
