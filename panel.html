@@ -3,15 +3,29 @@
 <head>
   <title>PromptHub</title>
   <link rel="stylesheet" href="panel-styles.css">
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
   <header>
     <h1>PromptHub</h1>
     <div class="header-actions">
-      <button id="refresh-btn" class="header-btn" title="Refresh">Refresh</button>
-      <button id="export-btn" class="header-btn" title="Export">Export</button>
-      <button id="import-btn" class="header-btn" title="Import">Import</button>
-      <a href="settings.html" class="header-btn" title="Settings">Settings</a>
+      <button id="refresh-btn" class="header-btn">
+        <i data-feather="refresh-cw"></i>
+        Refresh
+      </button>
+      <button id="export-btn" class="header-btn">
+        <i data-feather="download"></i>
+        Export
+      </button>
+      <button id="import-btn" class="header-btn">
+        <i data-feather="upload"></i>
+        Import
+      </button>
+      <a href="settings.html" target="_blank" class="header-btn">
+        <i data-feather="settings"></i>
+        Settings
+      </a>
       <input type="file" id="import-file" accept=".json" style="display: none;">
     </div>
   </header>
@@ -28,7 +42,12 @@
       <div id="prompts-list" class="list-container">
         <!-- Prompts will be inserted here by JavaScript -->
       </div>
-      <button id="add-prompt-btn" class="add-btn">+ Add New Prompt</button>
+      <div class="buttons-container">
+        <button id="add-prompt-btn" class="add-btn">
+          <i data-feather="plus"></i>
+          Add New Prompt
+        </button>
+      </div>
     </div>
     
     <!-- Chains Section -->
@@ -38,8 +57,14 @@
         <!-- Chains will be inserted here by JavaScript -->
       </div>
       <div class="buttons-container">
-        <button id="add-chain-btn" class="add-btn">+ Create New Chain</button>
-        <button id="add-raw-chain-btn" class="add-btn secondary">+ Add Raw Chain</button>
+        <button id="add-chain-btn" class="add-btn">
+          <i data-feather="plus"></i>
+          Create New Chain
+        </button>
+        <button id="add-raw-chain-btn" class="add-btn secondary">
+          <i data-feather="edit-3"></i>
+          Create from Text
+        </button>
       </div>
     </div>
   </div>
@@ -49,7 +74,9 @@
     <div class="dialog-content">
       <div class="dialog-header">
         <h2 id="prompt-dialog-title">Add New Prompt</h2>
-        <span class="close-btn">×</span>
+        <button type="button" class="close-btn" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
       </div>
       <div class="dialog-body">
         <form id="prompt-form">
@@ -76,7 +103,9 @@
     <div class="dialog-content">
       <div class="dialog-header">
         <h2 id="chain-dialog-title">Create New Chain</h2>
-        <span class="close-btn">×</span>
+        <button type="button" class="close-btn" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
       </div>
       <div class="dialog-body">
         <form id="chain-form">
@@ -94,9 +123,11 @@
             <div class="step-selector">
               <select id="prompt-selector">
                 <option value="">Select a prompt to add...</option>
-                <!-- Options will be added by JavaScript -->
               </select>
-              <button type="button" id="add-step-btn">Add</button>
+              <button type="button" id="add-step-btn">
+                <i data-feather="plus"></i>
+                Add Step
+              </button>
             </div>
           </div>
           <div class="form-actions">
@@ -113,7 +144,9 @@
     <div class="dialog-content">
       <div class="dialog-header">
         <h2>Create Chain from Raw Text</h2>
-        <span class="close-btn">×</span>
+        <button type="button" class="close-btn" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
       </div>
       <div class="dialog-body">
         <form id="raw-chain-form">

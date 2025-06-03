@@ -69,12 +69,13 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
 
-    // Enhanced button creation with icons
-    function createActionButton(text, className, icon = '', onClick = null) {
+    // Enhanced button creation with Feather icons
+    function createActionButton(text, className, iconName = '', onClick = null) {
       const button = SecurityUtils.createSafeElement('button', '', `action-btn ${className}`);
       
-      if (icon) {
-        const iconSpan = SecurityUtils.createSafeElement('span', icon, 'btn-icon');
+      if (iconName) {
+        const iconSpan = SecurityUtils.createSafeElement('span', '', 'btn-icon');
+        iconSpan.setAttribute('data-feather', iconName);
         button.appendChild(iconSpan);
       }
       
@@ -86,6 +87,17 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       
       return button;
+    }
+
+    // Function to initialize Feather icons
+    function initializeIcons() {
+      if (typeof feather !== 'undefined') {
+        feather.replace({
+          width: 12,
+          height: 12,
+          'stroke-width': 2
+        });
+      }
     }
 
     // Debounced search function
@@ -255,11 +267,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     }, 'Initial Load');
     setLoadingState(false);
     
+    // Initialize Feather icons after initial load
+    setTimeout(initializeIcons, 100);
+    
     // Function to load prompts list
     async function loadPrompts(query = '') {
       try {
         const prompts = query ? await Storage.searchPrompts(query) : await Storage.getPrompts();
         renderPromptsList(prompts);
+        // Initialize icons after rendering
+        setTimeout(initializeIcons, 10);
       } catch (error) {
         ErrorHandler.logError(error, 'Load Prompts');
         UIFeedback.showError('Failed to load prompts');
@@ -272,6 +289,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       try {
         const chains = query ? await Storage.searchChains(query) : await Storage.getChains();
         await renderChainsList(chains);
+        // Initialize icons after rendering
+        setTimeout(initializeIcons, 10);
       } catch (error) {
         ErrorHandler.logError(error, 'Load Chains');
         UIFeedback.showError('Failed to load chains');
@@ -322,16 +341,16 @@ document.addEventListener('DOMContentLoaded', async function() {
       const actions = SecurityUtils.createSafeElement('div', '', 'list-item-actions');
       
       // Insert button
-      const insertBtn = createActionButton('Insert', 'insert-btn', '', () => insertPrompt(prompt.id));
+      const insertBtn = createActionButton('Insert', 'insert-btn', 'arrow-down', () => insertPrompt(prompt.id));
       
       // Copy button
-      const copyBtn = createActionButton('Copy', 'copy-btn', '', () => copyToClipboard(prompt.content, 'Prompt'));
+      const copyBtn = createActionButton('Copy', 'copy-btn', 'copy', () => copyToClipboard(prompt.content, 'Prompt'));
       
       // Edit button
-      const editBtn = createActionButton('Edit', 'edit-btn', '', () => editPrompt(prompt.id));
+      const editBtn = createActionButton('Edit', 'edit-btn', 'edit-2', () => editPrompt(prompt.id));
       
       // Delete button
-      const deleteBtn = createActionButton('Delete', 'delete-btn', '', () => deletePrompt(prompt.id));
+      const deleteBtn = createActionButton('Delete', 'delete-btn', 'trash-2', () => deletePrompt(prompt.id));
       
       // Assemble element
       actions.appendChild(insertBtn);
@@ -393,16 +412,16 @@ document.addEventListener('DOMContentLoaded', async function() {
       const actions = SecurityUtils.createSafeElement('div', '', 'list-item-actions');
       
       // Insert button (starts the chain)
-      const insertBtn = createActionButton('Start', 'insert-btn', '', () => insertChain(chain.id));
+      const insertBtn = createActionButton('Start', 'insert-btn', 'play', () => insertChain(chain.id));
       
       // Copy button (copies all chain content)
-      const copyBtn = createActionButton('Copy All', 'copy-btn', '', () => copyChainContent(chain, promptsMap));
+      const copyBtn = createActionButton('Copy All', 'copy-btn', 'copy', () => copyChainContent(chain, promptsMap));
       
       // Edit button
-      const editBtn = createActionButton('Edit', 'edit-btn', '', () => editChain(chain.id));
+      const editBtn = createActionButton('Edit', 'edit-btn', 'edit-2', () => editChain(chain.id));
       
       // Delete button
-      const deleteBtn = createActionButton('Delete', 'delete-btn', '', () => deleteChain(chain.id));
+      const deleteBtn = createActionButton('Delete', 'delete-btn', 'trash-2', () => deleteChain(chain.id));
       
       actions.appendChild(insertBtn);
       actions.appendChild(copyBtn);
