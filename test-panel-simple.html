@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PromptHub Test</title>
+  <link rel="stylesheet" href="panel-styles.css">
+  <style>
+    .debug {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 10000;
+      max-width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="debug" id="debug">
+    Loading debug info...
+  </div>
+
+  <header>
+    <h1>PromptHub</h1>
+    <div class="header-actions">
+      <button id="refresh-btn" class="header-btn">
+        <i data-feather="refresh-cw"></i>
+        Refresh
+      </button>
+      <button id="export-btn" class="header-btn">
+        <i data-feather="download"></i>
+        Export
+      </button>
+      <button id="import-btn" class="header-btn">
+        <i data-feather="upload"></i>
+        Import
+      </button>
+      <a href="settings.html" target="_blank" class="header-btn">
+        <i data-feather="settings"></i>
+        Settings
+      </a>
+    </div>
+  </header>
+  
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search prompts and chains...">
+  </div>
+  
+  <div class="content-container">
+    <div class="content-header">
+      <h2>Your Library</h2>
+      <div class="add-buttons">
+        <button id="add-prompt-btn" class="add-btn prompt-add">
+          <i data-feather="plus"></i>
+          New Prompt
+        </button>
+        <button id="add-chain-btn" class="add-btn chain-add">
+          <i data-feather="link"></i>
+          New Chain
+        </button>
+      </div>
+    </div>
+    
+    <div id="cards-container" class="cards-grid">
+      <!-- Test cards will be inserted here -->
+      
+      <!-- Sample Prompt Card -->
+      <div class="card prompt-card" data-id="test-1">
+        <div class="card-header">
+          <div class="card-icon prompt-icon-1"></div>
+          <div class="card-content">
+            <h3 class="card-title">Sample Prompt</h3>
+            <p class="card-description">This is a test prompt to see how the card layout and icons work in the interface.</p>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="card-action-btn primary">
+            <i data-feather="arrow-down"></i>
+            Insert
+          </button>
+          <button class="card-action-btn success">
+            <i data-feather="copy"></i>
+            Copy
+          </button>
+          <button class="card-action-btn warning">
+            <i data-feather="edit-2"></i>
+            Edit
+          </button>
+          <button class="card-action-btn danger">
+            <i data-feather="trash-2"></i>
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <!-- Sample Chain Card -->
+      <div class="card chain-card" data-id="chain-1">
+        <button class="expand-btn">
+          <i data-feather="chevron-down"></i>
+        </button>
+        <div class="card-header">
+          <div class="card-icon">
+            <i data-feather="link"></i>
+            <div class="step-dots">3</div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">Sample Chain</h3>
+            <p class="card-description">3 steps • Click to expand and view steps</p>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="card-action-btn primary">
+            <i data-feather="play"></i>
+            Start
+          </button>
+          <button class="card-action-btn success">
+            <i data-feather="copy"></i>
+            Copy All
+          </button>
+          <button class="card-action-btn warning">
+            <i data-feather="edit-2"></i>
+            Edit
+          </button>
+          <button class="card-action-btn danger">
+            <i data-feather="trash-2"></i>
+            Delete
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    let debugInfo = [];
+    
+    function addDebug(msg) {
+      debugInfo.push(`${new Date().toLocaleTimeString()}: ${msg}`);
+      document.getElementById('debug').innerHTML = debugInfo.slice(-10).join('<br>');
+    }
+    
+    addDebug('Page loaded');
+    
+    // Check if Feather is available
+    if (typeof feather !== 'undefined') {
+      addDebug('✅ Feather library loaded');
+      
+      // Initialize icons
+      feather.replace();
+      addDebug('🎨 Feather icons initialized');
+      
+      // Check icon elements
+      const iconElements = document.querySelectorAll('[data-feather]');
+      addDebug(`🔍 Found ${iconElements.length} icon elements`);
+      
+      // Check if icons were replaced
+      setTimeout(() => {
+        const replacedIcons = document.querySelectorAll('[data-feather] svg');
+        addDebug(`🖼️ ${replacedIcons.length} icons rendered as SVG`);
+        
+        if (replacedIcons.length > 0) {
+          addDebug('✅ Icons rendering successfully!');
+        } else {
+          addDebug('❌ Icons not rendering');
+          
+          // Manual debug
+          iconElements.forEach((el, i) => {
+            addDebug(`Icon ${i}: ${el.getAttribute('data-feather')} -> ${el.innerHTML.substring(0,20)}...`);
+          });
+        }
+      }, 1000);
+      
+    } else {
+      addDebug('❌ Feather library not found');
+    }
+    
+    // Test click handlers
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('button')) {
+        addDebug(`🖱️ Clicked: ${e.target.closest('button').textContent.trim()}`);
+      }
+    });
+    
+    addDebug('JavaScript loaded successfully');
+  </script>
+</body>
+</html> 

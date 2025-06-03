@@ -2,7 +2,194 @@
  * Side Panel UI logic for PromptHub - Card-based design
  * Enhanced with error handling, validation, and security
  */
+
+// Mock data for testing when Chrome APIs are not available
+const MOCK_DATA = {
+  prompts: [
+    {
+      id: 'mock-1',
+      title: 'Welcome Prompt',
+      content: 'Hello! This is a sample prompt to demonstrate the PromptHub interface. You can use this to quickly insert pre-written text into any webpage.'
+    },
+    {
+      id: 'mock-2',
+      title: 'Meeting Follow-up',
+      content: 'Hi [NAME], Thank you for taking the time to meet with me today. I wanted to follow up on our discussion about [TOPIC] and share some additional thoughts...'
+    },
+    {
+      id: 'mock-3',
+      title: 'Code Review Template',
+      content: 'Code Review Summary:\n\n✅ What works well:\n- \n\n🔧 Areas for improvement:\n- \n\n💡 Suggestions:\n- \n\nOverall: Looking good! Please address the items above and we can merge.'
+    },
+    {
+      id: 'mock-4',
+      title: 'Email Signature',
+      content: 'Best regards,\n[YOUR NAME]\n[YOUR TITLE]\n[COMPANY NAME]\n📧 [EMAIL]\n📱 [PHONE]'
+    }
+  ],
+  chains: [
+    {
+      id: 'chain-1',
+      title: 'Project Setup Chain',
+      steps: ['mock-1', 'mock-2']
+    },
+    {
+      id: 'chain-2',
+      title: 'Complete Workflow',
+      steps: ['mock-1', 'mock-3', 'mock-4']
+    }
+  ]
+};
+
+// Check if we're in Chrome extension context
+function isExtensionContext() {
+  return typeof chrome !== 'undefined' && 
+         chrome.storage && 
+         chrome.storage.local;
+}
+
+// Mock Storage class for testing
+class MockStorage {
+  static async getPrompts() {
+    return [...MOCK_DATA.prompts];
+  }
+  
+  static async getChains() {
+    return [...MOCK_DATA.chains];
+  }
+  
+  static async getPromptById(id) {
+    return MOCK_DATA.prompts.find(p => p.id === id) || null;
+  }
+  
+  static async getChainById(id) {
+    return MOCK_DATA.chains.find(c => c.id === id) || null;
+  }
+  
+  static async savePrompt(prompt) {
+    const id = prompt.id || 'mock-' + Date.now();
+    const savedPrompt = { ...prompt, id };
+    console.log('Mock: Would save prompt:', savedPrompt);
+    return savedPrompt;
+  }
+  
+  static async saveChain(chain) {
+    const id = chain.id || 'chain-' + Date.now();
+    const savedChain = { ...chain, id };
+    console.log('Mock: Would save chain:', savedChain);
+    return savedChain;
+  }
+  
+  static async deletePrompt(id) {
+    console.log('Mock: Would delete prompt:', id);
+    return true;
+  }
+  
+  static async deleteChain(id) {
+    console.log('Mock: Would delete chain:', id);
+    return true;
+  }
+  
+  static async searchPrompts(query) {
+    return MOCK_DATA.prompts.filter(p => 
+      p.title.toLowerCase().includes(query.toLowerCase()) ||
+      p.content.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+  
+  static async searchChains(query) {
+    return MOCK_DATA.chains.filter(c => 
+      c.title.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
+  // Determine which Storage to use
+  const StorageProvider = isExtensionContext() ? Storage : MockStorage;
+  
+  if (!isExtensionContext()) {
+    console.log('🔧 Chrome APIs not available - using mock data for testing');
+    
+    // Mock chrome APIs for testing
+    window.chrome = {
+      storage: { local: { get: () => {}, set: () => {} } },
+      tabs: {
+        query: () => Promise.resolve([{id: 1, url: 'https://example.com'}]),
+        sendMessage: () => Promise.resolve({success: true})
+      }
+    };
+    
+    // Mock other required globals
+    if (typeof UIFeedback === 'undefined') {
+      window.UIFeedback = {
+        showSuccess: (msg) => console.log('✅', msg),
+        showError: (msg) => console.log('❌', msg),
+        showWarning: (msg) => console.log('⚠️', msg),
+        clearMessages: () => {}
+      };
+    }
+    
+    if (typeof ErrorHandler === 'undefined') {
+      window.ErrorHandler = {
+        logError: (error, context) => console.error(`[${context}]`, error),
+        createError: (message, code) => new Error(`[${code}] ${message}`)
+      };
+    }
+    
+    if (typeof AsyncOp === 'undefined') {
+      window.AsyncOp = {
+        withUserFeedback: async (fn, operation, successMsg) => {
+          try {
+            await fn();
+            if (successMsg) UIFeedback.showSuccess(successMsg);
+          } catch (error) {
+            ErrorHandler.logError(error, operation);
+            UIFeedback.showError(`${operation} failed: ${error.message}`);
+          }
+        },
+        withErrorHandling: async (fn, operation) => {
+          try {
+            await fn();
+          } catch (error) {
+            ErrorHandler.logError(error, operation);
+            UIFeedback.showError(`${operation} failed: ${error.message}`);
+          }
+        }
+      };
+    }
+    
+    if (typeof SecurityUtils === 'undefined') {
+      window.SecurityUtils = {
+        escapeHtml: (text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        },
+        createSafeElement: (tag, content, className) => {
+          const el = document.createElement(tag);
+          if (content) el.textContent = content;
+          if (className) el.className = className;
+          return el;
+        }
+      };
+    }
+    
+    if (typeof debounce === 'undefined') {
+      window.debounce = function(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      };
+    }
+  }
+
   // UI Elements
   const cardsContainer = document.getElementById('cards-container');
   const searchInput = document.getElementById('search-input');
@@ -23,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   const promptForm = document.getElementById('prompt-form');
   const chainForm = document.getElementById('chain-form');
   const rawChainForm = document.getElementById('raw-chain-form');
-
+  
   // Loading state management
   let isLoading = false;
 
@@ -264,8 +451,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   async function loadAllItems(query = '') {
     try {
       const [prompts, chains] = await Promise.all([
-        query ? Storage.searchPrompts(query) : Storage.getPrompts(),
-        query ? Storage.searchChains(query) : Storage.getChains()
+        query ? StorageProvider.searchPrompts(query) : StorageProvider.getPrompts(),
+        query ? StorageProvider.searchChains(query) : StorageProvider.getChains()
       ]);
       
       await renderAllItems(prompts, chains);
@@ -292,7 +479,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       
       // Get prompts map for chain rendering
-      const allPrompts = await Storage.getPrompts();
+      const allPrompts = await StorageProvider.getPrompts();
       const promptsMap = new Map(allPrompts.map(p => [p.id, p]));
       
       // Create all prompt cards
@@ -326,7 +513,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Action functions
   async function insertPrompt(id) {
     await AsyncOp.withUserFeedback(async () => {
-      const prompt = await Storage.getPromptById(id);
+      const prompt = await StorageProvider.getPromptById(id);
       if (!prompt) {
         throw ErrorHandler.createError('Prompt not found', 'PROMPT_NOT_FOUND');
       }
@@ -352,7 +539,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function insertChain(id) {
     await AsyncOp.withUserFeedback(async () => {
-      const chain = await Storage.getChainById(id);
+      const chain = await StorageProvider.getChainById(id);
       if (!chain) {
         throw ErrorHandler.createError('Chain not found', 'CHAIN_NOT_FOUND');
       }
@@ -367,7 +554,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function insertChainStep(chainId, stepIndex) {
     await AsyncOp.withUserFeedback(async () => {
-      const chain = await Storage.getChainById(chainId);
+      const chain = await StorageProvider.getChainById(chainId);
       if (!chain) {
         throw ErrorHandler.createError('Chain not found', 'CHAIN_NOT_FOUND');
       }
@@ -377,7 +564,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       
       const promptId = chain.steps[stepIndex];
-      const prompt = await Storage.getPromptById(promptId);
+      const prompt = await StorageProvider.getPromptById(promptId);
       
       if (!prompt) {
         throw ErrorHandler.createError(
@@ -414,13 +601,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function copyChainContent(chainId) {
     try {
-      const chain = await Storage.getChainById(chainId);
+      const chain = await StorageProvider.getChainById(chainId);
       if (!chain) {
         UIFeedback.showError('Chain not found');
         return;
       }
       
-      const allPrompts = await Storage.getPrompts();
+      const allPrompts = await StorageProvider.getPrompts();
       const promptsMap = new Map(allPrompts.map(p => [p.id, p]));
       
       const validSteps = chain.steps
@@ -445,7 +632,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function editPrompt(id) {
     try {
-      const prompt = await Storage.getPromptById(id);
+      const prompt = await StorageProvider.getPromptById(id);
       if (!prompt) {
         UIFeedback.showError('Prompt not found');
         return;
@@ -465,7 +652,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function editChain(id) {
     try {
-      const chain = await Storage.getChainById(id);
+      const chain = await StorageProvider.getChainById(id);
       if (!chain) {
         UIFeedback.showError('Chain not found');
         return;
@@ -481,7 +668,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (chain.steps.length === 0) {
         stepsContainer.innerHTML = '<p class="empty-message">No steps added yet</p>';
       } else {
-        const prompts = await Storage.getPrompts();
+        const prompts = await StorageProvider.getPrompts();
         const promptsMap = new Map(prompts.map(p => [p.id, p]));
         
         chain.steps.forEach(stepId => {
@@ -507,7 +694,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     await AsyncOp.withUserFeedback(async () => {
-      await Storage.deletePrompt(id);
+      await StorageProvider.deletePrompt(id);
       await loadAllItems();
     }, 'Delete Prompt', 'Prompt deleted successfully!');
   }
@@ -518,7 +705,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     await AsyncOp.withUserFeedback(async () => {
-      await Storage.deleteChain(id);
+      await StorageProvider.deleteChain(id);
       await loadAllItems();
     }, 'Delete Chain', 'Chain deleted successfully!');
   }
@@ -603,7 +790,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         content
       };
       
-      await Storage.savePrompt(prompt);
+      await StorageProvider.savePrompt(prompt);
       closeAllDialogs();
       await loadAllItems();
     }, 'Save Prompt', 'Prompt saved successfully!');
@@ -627,7 +814,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         steps
       };
       
-      await Storage.saveChain(chain);
+      await StorageProvider.saveChain(chain);
       closeAllDialogs();
       await loadAllItems();
     }, 'Save Chain', 'Chain saved successfully!');
@@ -674,7 +861,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           content: promptContent
         };
         
-        const savedPrompt = await Storage.savePrompt(prompt);
+        const savedPrompt = await StorageProvider.savePrompt(prompt);
         promptIds.push(savedPrompt.id);
       }
       
@@ -690,7 +877,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         steps: promptIds
       };
       
-      await Storage.saveChain(chain);
+      await StorageProvider.saveChain(chain);
       closeAllDialogs();
       await loadAllItems();
     }, 'Create Raw Chain', `Chain "${document.getElementById('raw-chain-title').value}" created successfully!`);
@@ -770,7 +957,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Helper functions for chain building (keeping existing functionality)
   async function loadPromptSelector() {
     try {
-      const prompts = await Storage.getPrompts();
+      const prompts = await StorageProvider.getPrompts();
       const selector = document.getElementById('prompt-selector');
       
       const firstOption = selector.querySelector('option[value=""]');

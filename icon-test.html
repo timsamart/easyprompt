@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Icon Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+    .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Feather Icons Test</h1>
+  
+  <div class="test-section">
+    <h2>Direct Icons</h2>
+    <p>These should become SVG icons:</p>
+    <i data-feather="heart"></i>
+    <i data-feather="star"></i>
+    <i data-feather="home"></i>
+    <i data-feather="user"></i>
+  </div>
+
+  <div class="test-section">
+    <h2>Icons in Buttons</h2>
+    <button><i data-feather="play"></i> Play</button>
+    <button><i data-feather="pause"></i> Pause</button>
+    <button><i data-feather="stop"></i> Stop</button>
+  </div>
+
+  <div class="test-section">
+    <h2>Debug Info</h2>
+    <div id="debug" class="debug">Loading...</div>
+  </div>
+
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    function updateDebug(msg) {
+      document.getElementById('debug').innerHTML += msg + '<br>';
+    }
+
+    updateDebug('Script started');
+    updateDebug('Feather available: ' + (typeof feather !== 'undefined'));
+    
+    if (typeof feather !== 'undefined') {
+      updateDebug('Feather version: ' + (feather.VERSION || 'unknown'));
+      
+      const beforeCount = document.querySelectorAll('[data-feather]').length;
+      updateDebug('Icons before replace: ' + beforeCount);
+      
+      feather.replace();
+      updateDebug('feather.replace() called');
+      
+      setTimeout(() => {
+        const afterCount = document.querySelectorAll('[data-feather]').length;
+        const svgCount = document.querySelectorAll('svg').length;
+        updateDebug('Icons after replace: ' + afterCount);
+        updateDebug('SVG elements: ' + svgCount);
+        
+        // Check first icon
+        const firstIcon = document.querySelector('[data-feather]');
+        if (firstIcon) {
+          updateDebug('First icon HTML: ' + firstIcon.innerHTML.substring(0, 100));
+        }
+      }, 100);
+    } else {
+      updateDebug('ERROR: Feather not loaded');
+    }
+  </script>
+</body>
+</html> 

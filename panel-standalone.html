@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PromptHub - Standalone Demo</title>
+  <link rel="stylesheet" href="panel-styles.css">
+</head>
+<body>
+  <header>
+    <h1>PromptHub</h1>
+    <div class="header-actions">
+      <button id="refresh-btn" class="header-btn">
+        <i data-feather="refresh-cw"></i>
+        Refresh
+      </button>
+      <button id="export-btn" class="header-btn">
+        <i data-feather="download"></i>
+        Export
+      </button>
+      <button id="import-btn" class="header-btn">
+        <i data-feather="upload"></i>
+        Import
+      </button>
+      <a href="settings.html" target="_blank" class="header-btn">
+        <i data-feather="settings"></i>
+        Settings
+      </a>
+      <input type="file" id="import-file" accept=".json" style="display: none;">
+    </div>
+  </header>
+  
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search prompts and chains...">
+  </div>
+  
+  <!-- Main Content Container -->
+  <div class="content-container">
+    <div class="content-header">
+      <h2>Your Library</h2>
+      <div class="add-buttons">
+        <button id="add-prompt-btn" class="add-btn prompt-add">
+          <i data-feather="plus"></i>
+          New Prompt
+        </button>
+        <button id="add-chain-btn" class="add-btn chain-add">
+          <i data-feather="link"></i>
+          New Chain
+        </button>
+        <button id="add-raw-chain-btn" class="add-btn chain-add secondary">
+          <i data-feather="edit-3"></i>
+          From Text
+        </button>
+      </div>
+    </div>
+    
+    <!-- Unified Cards Container -->
+    <div id="cards-container" class="cards-grid">
+      <!-- Cards will be inserted here by JavaScript -->
+    </div>
+  </div>
+  
+  <!-- Prompt Form Dialog -->
+  <div id="prompt-dialog" class="dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="prompt-dialog-title">Add New Prompt</h2>
+        <button type="button" class="close-btn" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <form id="prompt-form">
+          <input type="hidden" id="prompt-id">
+          <div class="form-group">
+            <label for="prompt-title">Prompt Title:</label>
+            <input type="text" id="prompt-title" required>
+          </div>
+          <div class="form-group">
+            <label for="prompt-content">Prompt Text:</label>
+            <textarea id="prompt-content" rows="6" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chain Form Dialog -->
+  <div id="chain-dialog" class="dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="chain-dialog-title">Create New Chain</h2>
+        <button type="button" class="close-btn" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <form id="chain-form">
+          <input type="hidden" id="chain-id">
+          <div class="form-group">
+            <label for="chain-title">Chain Title:</label>
+            <input type="text" id="chain-title" required>
+          </div>
+          <div class="form-group">
+            <label>Chain Steps:</label>
+            <div id="chain-steps">
+              <!-- Step selection will be added here -->
+              <p class="empty-message">No steps added yet</p>
+            </div>
+            <div class="step-selector">
+              <select id="prompt-selector">
+                <option value="">Select a prompt to add...</option>
+              </select>
+              <button type="button" id="add-step-btn">
+                <i data-feather="plus"></i>
+                Add Step
+              </button>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Raw Chain Dialog -->
+  <div id="raw-chain-dialog" class="dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2>Create Chain from Raw Text</h2>
+        <button type="button" class="close-btn" aria-label="Close">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <form id="raw-chain-form">
+          <div class="form-group">
+            <label for="raw-chain-title">Chain Title:</label>
+            <input type="text" id="raw-chain-title" required>
+          </div>
+          <div class="form-group">
+            <label for="raw-content">Paste Multiple Prompts:</label>
+            <p class="help-text">Each prompt should be separated by <code>---</code> on a new line. The first line of each prompt will be used as its title.</p>
+            <textarea id="raw-content" rows="10" required placeholder="Prompt 1 Title&#10;Prompt 1 content...&#10;---&#10;Prompt 2 Title&#10;Prompt 2 content..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Create Chain</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    // Inline utility functions and mock data
+    const MOCK_DATA = {
+      prompts: [
+        {
+          id: 'demo-1',
+          title: 'Welcome Message',
+          content: 'Hello! Welcome to PromptHub. This extension helps you manage and quickly insert pre-written text snippets into any webpage. Perfect for email templates, code snippets, or frequently used responses.'
+        },
+        {
+          id: 'demo-2',
+          title: 'Meeting Follow-up Email',
+          content: 'Hi [NAME],\n\nThank you for taking the time to meet with me today. I wanted to follow up on our discussion about [TOPIC] and share some additional thoughts.\n\nKey points from our meeting:\n• [POINT 1]\n• [POINT 2]\n• [POINT 3]\n\nNext steps:\n1. [ACTION 1]\n2. [ACTION 2]\n\nPlease let me know if you have any questions or if there\'s anything else I can help with.\n\nBest regards,\n[YOUR NAME]'
+        },
+        {
+          id: 'demo-3',
+          title: 'Code Review Template',
+          content: '## Code Review Summary\n\n### ✅ What works well:\n- Clean, readable code structure\n- Good variable naming conventions\n- Proper error handling\n\n### 🔧 Areas for improvement:\n- Consider adding more inline comments\n- Some functions could be broken down further\n- Unit tests could be more comprehensive\n\n### 💡 Suggestions:\n- Extract constants to a config file\n- Add input validation for edge cases\n- Consider using TypeScript for better type safety\n\n### Overall Assessment:\nLooking good! Please address the items above and we can merge this PR.'
+        },
+        {
+          id: 'demo-4',
+          title: 'Professional Email Signature',
+          content: 'Best regards,\n\n[YOUR NAME]\n[YOUR TITLE]\n[COMPANY NAME]\n\n📧 [your.email@company.com]\n📱 [+1 (555) 123-4567]\n🌐 [www.company.com]\n💼 [LinkedIn Profile]'
+        },
+        {
+          id: 'demo-5',
+          title: 'Bug Report Template',
+          content: '## Bug Report\n\n**Environment:**\n- Browser: [Browser name and version]\n- OS: [Operating system]\n- Device: [Desktop/Mobile/Tablet]\n\n**Steps to Reproduce:**\n1. [First step]\n2. [Second step]\n3. [Third step]\n\n**Expected Behavior:**\n[Describe what you expected to happen]\n\n**Actual Behavior:**\n[Describe what actually happened]\n\n**Screenshots:**\n[If applicable, add screenshots to help explain the problem]\n\n**Additional Context:**\n[Add any other context about the problem here]'
+        }
+      ],
+      chains: [
+        {
+          id: 'chain-1',
+          title: 'Professional Email Workflow',
+          steps: ['demo-1', 'demo-2', 'demo-4']
+        },
+        {
+          id: 'chain-2',
+          title: 'Development Workflow',
+          steps: ['demo-3', 'demo-5']
+        }
+      ]
+    };
+
+    // Utility functions
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function createSafeElement(tag, content, className) {
+      const el = document.createElement(tag);
+      if (content) el.textContent = content;
+      if (className) el.className = className;
+      return el;
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Mock storage provider
+    class MockStorage {
+      static async getPrompts() {
+        return [...MOCK_DATA.prompts];
+      }
+      
+      static async getChains() {
+        return [...MOCK_DATA.chains];
+      }
+      
+      static async getPromptById(id) {
+        return MOCK_DATA.prompts.find(p => p.id === id) || null;
+      }
+      
+      static async getChainById(id) {
+        return MOCK_DATA.chains.find(c => c.id === id) || null;
+      }
+      
+      static async searchPrompts(query) {
+        return MOCK_DATA.prompts.filter(p => 
+          p.title.toLowerCase().includes(query.toLowerCase()) ||
+          p.content.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+      
+      static async searchChains(query) {
+        return MOCK_DATA.chains.filter(c => 
+          c.title.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+    }
+
+    // UI Feedback system
+    const UIFeedback = {
+      showSuccess: (msg) => {
+        console.log('✅ Success:', msg);
+        showToast(msg, 'success');
+      },
+      showError: (msg) => {
+        console.log('❌ Error:', msg);
+        showToast(msg, 'error');
+      },
+      showWarning: (msg) => {
+        console.log('⚠️ Warning:', msg);
+        showToast(msg, 'warning');
+      },
+      clearMessages: () => {}
+    };
+
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `message message-${type}`;
+      toast.innerHTML = `
+        <span>${escapeHtml(message)}</span>
+        <button class="message-close" onclick="this.parentElement.remove()">×</button>
+      `;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, 5000);
+    }
+
+    // Generate random icon class for prompts
+    function getRandomPromptIcon() {
+      const iconCount = 10;
+      const randomNum = Math.floor(Math.random() * iconCount) + 1;
+      return `prompt-icon-${randomNum}`;
+    }
+
+    // Initialize Feather icons
+    function initializeIcons() {
+      if (typeof feather !== 'undefined') {
+        feather.replace();
+      }
+    }
+
+    // Create prompt card
+    function createPromptCard(prompt) {
+      const card = createSafeElement('div', '', 'card prompt-card');
+      card.dataset.id = prompt.id;
+      
+      const iconClass = getRandomPromptIcon();
+      
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="card-icon ${iconClass}"></div>
+          <div class="card-content">
+            <h3 class="card-title">${escapeHtml(prompt.title)}</h3>
+            <p class="card-description">${escapeHtml(prompt.content)}</p>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="card-action-btn primary" data-action="insert" data-id="${prompt.id}">
+            <i data-feather="arrow-down"></i>
+            Insert
+          </button>
+          <button class="card-action-btn success" data-action="copy" data-content="${escapeHtml(prompt.content)}">
+            <i data-feather="copy"></i>
+            Copy
+          </button>
+          <button class="card-action-btn warning" data-action="edit" data-id="${prompt.id}">
+            <i data-feather="edit-2"></i>
+            Edit
+          </button>
+          <button class="card-action-btn danger" data-action="delete" data-id="${prompt.id}">
+            <i data-feather="trash-2"></i>
+            Delete
+          </button>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    // Create chain card
+    function createChainCard(chain, promptsMap) {
+      const card = createSafeElement('div', '', 'card chain-card');
+      card.dataset.id = chain.id;
+      
+      const stepCount = chain.steps.length;
+      const validSteps = chain.steps.filter(stepId => promptsMap.has(stepId));
+      
+      card.innerHTML = `
+        <button class="expand-btn" data-action="toggle">
+          <i data-feather="chevron-down"></i>
+        </button>
+        <div class="card-header">
+          <div class="card-icon">
+            <i data-feather="link"></i>
+            <div class="step-dots">${stepCount}</div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">${escapeHtml(chain.title)}</h3>
+            <p class="card-description">${stepCount} step${stepCount !== 1 ? 's' : ''} • Click to expand and view steps</p>
+          </div>
+        </div>
+        <div class="chain-steps">
+          ${validSteps.map((stepId, index) => {
+            const prompt = promptsMap.get(stepId);
+            return `
+              <div class="chain-step-item" data-action="insert-step" data-chain-id="${chain.id}" data-step-index="${index}">
+                <div class="step-number-badge">${index + 1}</div>
+                <div class="step-title">${escapeHtml(prompt.title)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="card-actions">
+          <button class="card-action-btn primary" data-action="start-chain" data-id="${chain.id}">
+            <i data-feather="play"></i>
+            Start
+          </button>
+          <button class="card-action-btn success" data-action="copy-chain" data-id="${chain.id}">
+            <i data-feather="copy"></i>
+            Copy All
+          </button>
+          <button class="card-action-btn warning" data-action="edit" data-id="${chain.id}">
+            <i data-feather="edit-2"></i>
+            Edit
+          </button>
+          <button class="card-action-btn danger" data-action="delete" data-id="${chain.id}">
+            <i data-feather="trash-2"></i>
+            Delete
+          </button>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    // Clipboard functionality
+    async function copyToClipboard(text, item = 'text') {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          if (!successful) {
+            throw new Error('Copy command failed');
+          }
+        }
+        
+        UIFeedback.showSuccess(`${item} copied to clipboard!`);
+        return true;
+      } catch (error) {
+        UIFeedback.showError(`Failed to copy ${item}: ${error.message}`);
+        return false;
+      }
+    }
+
+    // Load and render all items
+    async function loadAllItems(query = '') {
+      try {
+        const cardsContainer = document.getElementById('cards-container');
+        
+        const [prompts, chains] = await Promise.all([
+          query ? MockStorage.searchPrompts(query) : MockStorage.getPrompts(),
+          query ? MockStorage.searchChains(query) : MockStorage.getChains()
+        ]);
+        
+        cardsContainer.innerHTML = '';
+        
+        if (prompts.length === 0 && chains.length === 0) {
+          cardsContainer.innerHTML = `
+            <div class="empty-state">
+              <h3>No prompts or chains found</h3>
+              <p>Try adjusting your search terms or create new items using the buttons above.</p>
+            </div>
+          `;
+          return;
+        }
+        
+        // Get prompts map for chain rendering
+        const allPrompts = await MockStorage.getPrompts();
+        const promptsMap = new Map(allPrompts.map(p => [p.id, p]));
+        
+        // Create all prompt cards
+        prompts.forEach(prompt => {
+          const promptCard = createPromptCard(prompt);
+          cardsContainer.appendChild(promptCard);
+        });
+        
+        // Create all chain cards
+        chains.forEach(chain => {
+          const chainCard = createChainCard(chain, promptsMap);
+          cardsContainer.appendChild(chainCard);
+        });
+        
+        // Initialize icons after content is added
+        setTimeout(initializeIcons, 100);
+        
+      } catch (error) {
+        console.error('Failed to load items:', error);
+        document.getElementById('cards-container').innerHTML = 
+          '<div class="error-message">Failed to display items</div>';
+      }
+    }
+
+    // Event handling
+    function handleCardClick(e) {
+      const button = e.target.closest('[data-action]');
+      if (!button) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const action = button.dataset.action;
+      const id = button.dataset.id;
+      const card = button.closest('.card');
+      
+      switch (action) {
+        case 'copy':
+          copyToClipboard(button.dataset.content, 'Prompt');
+          break;
+        case 'insert':
+          UIFeedback.showSuccess('Would insert prompt into active tab');
+          break;
+        case 'edit':
+          UIFeedback.showSuccess('Edit dialog would open');
+          break;
+        case 'delete':
+          if (confirm('Are you sure you want to delete this item?')) {
+            UIFeedback.showSuccess('Item would be deleted');
+          }
+          break;
+        case 'start-chain':
+          UIFeedback.showSuccess('Chain would be started');
+          break;
+        case 'copy-chain':
+          copyChainContent(id);
+          break;
+        case 'toggle':
+          card.classList.toggle('expanded');
+          setTimeout(initializeIcons, 10);
+          break;
+      }
+    }
+
+    async function copyChainContent(chainId) {
+      try {
+        const chain = await MockStorage.getChainById(chainId);
+        if (!chain) {
+          UIFeedback.showError('Chain not found');
+          return;
+        }
+        
+        const allPrompts = await MockStorage.getPrompts();
+        const promptsMap = new Map(allPrompts.map(p => [p.id, p]));
+        
+        const validSteps = chain.steps
+          .map(stepId => promptsMap.get(stepId))
+          .filter(prompt => prompt);
+        
+        if (validSteps.length === 0) {
+          UIFeedback.showWarning('No valid steps found in chain');
+          return;
+        }
+        
+        const chainContent = validSteps
+          .map((prompt, index) => `Step ${index + 1}: ${prompt.title}\n${prompt.content}`)
+          .join('\n\n---\n\n');
+        
+        await copyToClipboard(chainContent, 'Chain');
+      } catch (error) {
+        UIFeedback.showError('Failed to copy chain content');
+      }
+    }
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', async function() {
+      console.log('🚀 PromptHub Demo loaded');
+      
+      // Set up search with debouncing
+      const searchInput = document.getElementById('search-input');
+      const debouncedSearch = debounce(async function(query) {
+        await loadAllItems(query.trim());
+      }, 300);
+      
+      searchInput.addEventListener('input', function() {
+        debouncedSearch(this.value);
+      });
+      
+      // Set up card click handling
+      document.getElementById('cards-container').addEventListener('click', handleCardClick);
+      
+      // Set up refresh button
+      document.getElementById('refresh-btn').addEventListener('click', async function() {
+        UIFeedback.showSuccess('Refreshing...');
+        await loadAllItems();
+      });
+      
+      // Initial load
+      await loadAllItems();
+      
+      console.log('✅ PromptHub Demo ready');
+    });
+
+    // Initialize Feather icons when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        if (typeof feather !== 'undefined') {
+          feather.replace();
+        }
+      }, 200);
+    });
+  </script>
+</body>
+</html> 
