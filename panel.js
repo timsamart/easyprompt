@@ -1,11 +1,10 @@
 /**
- * Side Panel UI logic for PromptHub
+ * Side Panel UI logic for PromptHub - Card-based design
  * Enhanced with error handling, validation, and security
  */
 document.addEventListener('DOMContentLoaded', async function() {
   // UI Elements
-  const promptsList = document.getElementById('prompts-list');
-  const chainsList = document.getElementById('chains-list');
+  const cardsContainer = document.getElementById('cards-container');
   const searchInput = document.getElementById('search-input');
   const addPromptBtn = document.getElementById('add-prompt-btn');
   const addChainBtn = document.getElementById('add-chain-btn');
@@ -38,14 +37,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
+  // Function to initialize Feather icons
+  function initializeIcons() {
+    if (typeof feather !== 'undefined') {
+      feather.replace();
+    }
+  }
+
   // Clipboard functionality
   async function copyToClipboard(text, item = 'text') {
     try {
       if (navigator.clipboard && window.isSecureContext) {
-        // Use the modern Clipboard API
         await navigator.clipboard.writeText(text);
       } else {
-        // Fallback for older browsers or non-secure contexts
         const textArea = document.createElement('textarea');
         textArea.value = text;
         textArea.style.position = 'fixed';
@@ -72,45 +76,176 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
-  // Enhanced button creation with Feather icons
-  function createActionButton(text, className, iconName = '', onClick = null) {
-    const button = SecurityUtils.createSafeElement('button', '', `action-btn ${className}`);
-    
-    if (iconName) {
-      const iconSpan = SecurityUtils.createSafeElement('span', '', 'btn-icon');
-      iconSpan.setAttribute('data-feather', iconName);
-      button.appendChild(iconSpan);
-    }
-    
-    const textSpan = SecurityUtils.createSafeElement('span', text, 'btn-text');
-    button.appendChild(textSpan);
-    
-    if (onClick) {
-      button.addEventListener('click', onClick);
-    }
-    
-    return button;
+  // Generate random icon class for prompts
+  function getRandomPromptIcon() {
+    const iconCount = 10;
+    const randomNum = Math.floor(Math.random() * iconCount) + 1;
+    return `prompt-icon-${randomNum}`;
   }
 
-  // Function to initialize Feather icons
-  function initializeIcons() {
-    if (typeof feather !== 'undefined') {
-      feather.replace({
-        width: 14,
-        height: 14,
-        'stroke-width': 2
-      });
-    }
+  // Create prompt card
+  function createPromptCard(prompt) {
+    const card = SecurityUtils.createSafeElement('div', '', 'card prompt-card');
+    card.dataset.id = prompt.id;
+    
+    const iconClass = getRandomPromptIcon();
+    
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon ${iconClass}"></div>
+        <div class="card-content">
+          <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
+          <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="card-action-btn primary" data-action="insert" data-id="${prompt.id}">
+          <i data-feather="arrow-down"></i>
+          Insert
+        </button>
+        <button class="card-action-btn success" data-action="copy" data-content="${SecurityUtils.escapeHtml(prompt.content)}">
+          <i data-feather="copy"></i>
+          Copy
+        </button>
+        <button class="card-action-btn warning" data-action="edit" data-id="${prompt.id}">
+          <i data-feather="edit-2"></i>
+          Edit
+        </button>
+        <button class="card-action-btn danger" data-action="delete" data-id="${prompt.id}">
+          <i data-feather="trash-2"></i>
+          Delete
+        </button>
+      </div>
+    `;
+    
+    // Add event listeners
+    addCardEventListeners(card);
+    
+    return card;
+  }
+
+  // Create chain card
+  function createChainCard(chain, promptsMap) {
+    const card = SecurityUtils.createSafeElement('div', '', 'card chain-card');
+    card.dataset.id = chain.id;
+    
+    const stepCount = chain.steps.length;
+    const validSteps = chain.steps.filter(stepId => promptsMap.has(stepId));
+    
+    card.innerHTML = `
+      <button class="expand-btn" data-action="toggle">
+        <i data-feather="chevron-down"></i>
+      </button>
+      <div class="card-header">
+        <div class="card-icon">
+          <i data-feather="link"></i>
+          <div class="step-dots">${stepCount}</div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">${SecurityUtils.escapeHtml(chain.title)}</h3>
+          <p class="card-description">${stepCount} step${stepCount !== 1 ? 's' : ''} • Click to expand and view steps</p>
+        </div>
+      </div>
+      <div class="chain-steps">
+        ${validSteps.map((stepId, index) => {
+          const prompt = promptsMap.get(stepId);
+          return `
+            <div class="chain-step-item" data-action="insert-step" data-chain-id="${chain.id}" data-step-index="${index}">
+              <div class="step-number-badge">${index + 1}</div>
+              <div class="step-title">${SecurityUtils.escapeHtml(prompt.title)}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="card-actions">
+        <button class="card-action-btn primary" data-action="start-chain" data-id="${chain.id}">
+          <i data-feather="play"></i>
+          Start
+        </button>
+        <button class="card-action-btn success" data-action="copy-chain" data-id="${chain.id}">
+          <i data-feather="copy"></i>
+          Copy All
+        </button>
+        <button class="card-action-btn warning" data-action="edit" data-id="${chain.id}">
+          <i data-feather="edit-2"></i>
+          Edit
+        </button>
+        <button class="card-action-btn danger" data-action="delete" data-id="${chain.id}">
+          <i data-feather="trash-2"></i>
+          Delete
+        </button>
+      </div>
+    `;
+    
+    // Add event listeners
+    addCardEventListeners(card);
+    
+    return card;
+  }
+
+  // Add event listeners to card buttons
+  function addCardEventListeners(card) {
+    card.addEventListener('click', async (e) => {
+      const button = e.target.closest('[data-action]');
+      if (!button) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const action = button.dataset.action;
+      const id = button.dataset.id;
+      
+      switch (action) {
+        case 'insert':
+          await insertPrompt(id);
+          break;
+        case 'copy':
+          await copyToClipboard(button.dataset.content, 'Prompt');
+          break;
+        case 'edit':
+          if (card.classList.contains('prompt-card')) {
+            await editPrompt(id);
+          } else {
+            await editChain(id);
+          }
+          break;
+        case 'delete':
+          if (card.classList.contains('prompt-card')) {
+            await deletePrompt(id);
+          } else {
+            await deleteChain(id);
+          }
+          break;
+        case 'start-chain':
+          await insertChain(id);
+          break;
+        case 'copy-chain':
+          await copyChainContent(id);
+          break;
+        case 'insert-step':
+          await insertChainStep(button.dataset.chainId, parseInt(button.dataset.stepIndex));
+          break;
+        case 'toggle':
+          toggleChainExpansion(card);
+          break;
+      }
+      
+      // Re-initialize icons after any action
+      setTimeout(initializeIcons, 10);
+    });
+  }
+
+  // Toggle chain expansion
+  function toggleChainExpansion(card) {
+    card.classList.toggle('expanded');
+    setTimeout(initializeIcons, 10);
   }
 
   // Debounced search function
   const debouncedSearch = debounce(async function(query) {
     try {
       setLoadingState(true);
-      await Promise.all([
-        loadPrompts(query),
-        loadChains(query)
-      ]);
+      await loadAllItems(query);
     } catch (error) {
       ErrorHandler.logError(error, 'Search');
       UIFeedback.showError('Search failed. Please try again.');
@@ -124,524 +259,71 @@ document.addEventListener('DOMContentLoaded', async function() {
     const query = this.value.trim();
     debouncedSearch(query);
   });
-  
-  // Close dialogs when clicking on X or outside
-  document.querySelectorAll('.close-btn, .cancel-btn').forEach(elem => {
-    elem.addEventListener('click', function() {
-      closeAllDialogs();
-    });
-  });
-  
-  window.addEventListener('click', function(event) {
-    if (event.target === promptDialog || 
-        event.target === chainDialog || 
-        event.target === rawChainDialog) {
-      closeAllDialogs();
-    }
-  });
 
-  function closeAllDialogs() {
-    promptDialog.style.display = 'none';
-    chainDialog.style.display = 'none';
-    rawChainDialog.style.display = 'none';
-    UIFeedback.clearMessages();
+  // Load and render all items (prompts and chains)
+  async function loadAllItems(query = '') {
+    try {
+      const [prompts, chains] = await Promise.all([
+        query ? Storage.searchPrompts(query) : Storage.getPrompts(),
+        query ? Storage.searchChains(query) : Storage.getChains()
+      ]);
+      
+      await renderAllItems(prompts, chains);
+      setTimeout(initializeIcons, 10);
+    } catch (error) {
+      ErrorHandler.logError(error, 'Load All Items');
+      UIFeedback.showError('Failed to load items');
+      renderEmptyState();
+    }
   }
-  
-  // Add prompt
-  addPromptBtn.addEventListener('click', function() {
+
+  // Render all items in the unified container
+  async function renderAllItems(prompts, chains) {
     try {
-      document.getElementById('prompt-dialog-title').textContent = 'Add New Prompt';
-      document.getElementById('prompt-id').value = '';
-      document.getElementById('prompt-title').value = '';
-      document.getElementById('prompt-content').value = '';
-      promptDialog.style.display = 'block';
-    } catch (error) {
-      ErrorHandler.logError(error, 'Add Prompt Dialog');
-      UIFeedback.showError('Failed to open add prompt dialog');
-    }
-  });
-  
-  // Add chain
-  addChainBtn.addEventListener('click', async function() {
-    try {
-      document.getElementById('chain-dialog-title').textContent = 'Create New Chain';
-      document.getElementById('chain-id').value = '';
-      document.getElementById('chain-title').value = '';
-      document.getElementById('chain-steps').innerHTML = '<p class="empty-message">No steps added yet</p>';
+      if (!cardsContainer) {
+        throw new Error('Cards container not found');
+      }
+
+      cardsContainer.innerHTML = '';
       
-      // Load prompts for selection
-      await loadPromptSelector();
-      
-      chainDialog.style.display = 'block';
-    } catch (error) {
-      ErrorHandler.logError(error, 'Add Chain Dialog');
-      UIFeedback.showError('Failed to open add chain dialog');
-    }
-  });
-  
-  // Add raw chain
-  addRawChainBtn.addEventListener('click', function() {
-    try {
-      document.getElementById('raw-chain-title').value = '';
-      document.getElementById('raw-content').value = '';
-      rawChainDialog.style.display = 'block';
-    } catch (error) {
-      ErrorHandler.logError(error, 'Add Raw Chain Dialog');
-      UIFeedback.showError('Failed to open raw chain dialog');
-    }
-  });
-  
-  // Save prompt
-  promptForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    await AsyncOp.withUserFeedback(async () => {
-      const id = document.getElementById('prompt-id').value;
-      const title = document.getElementById('prompt-title').value;
-      const content = document.getElementById('prompt-content').value;
-      
-      const prompt = {
-        id: id || undefined,
-        title,
-        content
-      };
-      
-      await Storage.savePrompt(prompt);
-      closeAllDialogs();
-      await loadPrompts();
-    }, 'Save Prompt', 'Prompt saved successfully!');
-  });
-  
-  // Add step to chain
-  document.getElementById('add-step-btn').addEventListener('click', async function() {
-    try {
-      const selector = document.getElementById('prompt-selector');
-      const promptId = selector.value;
-      
-      if (!promptId) {
-        UIFeedback.showWarning('Please select a prompt to add');
+      if (prompts.length === 0 && chains.length === 0) {
+        renderEmptyState();
         return;
       }
       
-      const promptText = selector.options[selector.selectedIndex].text;
-      addStepToChainBuilder(promptId, promptText);
+      // Get prompts map for chain rendering
+      const allPrompts = await Storage.getPrompts();
+      const promptsMap = new Map(allPrompts.map(p => [p.id, p]));
       
-      // Reset selector
-      selector.value = '';
-    } catch (error) {
-      ErrorHandler.logError(error, 'Add Step to Chain');
-      UIFeedback.showError('Failed to add step to chain');
-    }
-  });
-  
-  // Save chain
-  chainForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    await AsyncOp.withUserFeedback(async () => {
-      const id = document.getElementById('chain-id').value;
-      const title = document.getElementById('chain-title').value;
-      
-      // Collect steps
-      const steps = [];
-      document.querySelectorAll('.chain-step').forEach(step => {
-        steps.push(step.dataset.promptId);
-      });
-      
-      const chain = {
-        id: id || undefined,
-        title,
-        steps
-      };
-      
-      await Storage.saveChain(chain);
-      closeAllDialogs();
-      await loadChains();
-    }, 'Save Chain', 'Chain saved successfully!');
-  });
-  
-  // Process and save raw chain
-  rawChainForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    await AsyncOp.withUserFeedback(async () => {
-      const chainTitle = document.getElementById('raw-chain-title').value.trim();
-      const rawContent = document.getElementById('raw-content').value.trim();
-      
-      if (!chainTitle) {
-        throw ErrorHandler.createError('Chain title is required', 'MISSING_TITLE');
-      }
-      
-      if (!rawContent) {
-        throw ErrorHandler.createError('Content is required', 'MISSING_CONTENT');
-      }
-      
-      // Split the content by the delimiter
-      const delimiterRegex = /\n---\n/g;
-      const promptTexts = rawContent.split(delimiterRegex);
-      
-      if (promptTexts.length === 0) {
-        throw ErrorHandler.createError(
-          'No valid content found. Please check the format.',
-          'INVALID_FORMAT'
-        );
-      }
-      
-      // Create a prompt for each section
-      const promptIds = [];
-      for (let i = 0; i < promptTexts.length; i++) {
-        const promptText = promptTexts[i].trim();
-        if (!promptText) continue;
-        
-        // Get the first line as title, rest as content
-        const lines = promptText.split('\n');
-        const promptTitle = lines[0].trim() || `${chainTitle} - Step ${i + 1}`;
-        const promptContent = lines.slice(1).join('\n').trim();
-        
-        if (!promptContent) continue;
-        
-        // Create the prompt
-        const prompt = {
-          title: promptTitle,
-          content: promptContent
-        };
-        
-        const savedPrompt = await Storage.savePrompt(prompt);
-        promptIds.push(savedPrompt.id);
-      }
-      
-      if (promptIds.length === 0) {
-        throw ErrorHandler.createError(
-          'No valid prompts were created. Please check your input format.',
-          'NO_PROMPTS_CREATED'
-        );
-      }
-      
-      // Create the chain with these prompts
-      const chain = {
-        title: chainTitle,
-        steps: promptIds
-      };
-      
-      await Storage.saveChain(chain);
-      closeAllDialogs();
-      await Promise.all([loadPrompts(), loadChains()]);
-    }, 'Create Raw Chain', `Chain "${document.getElementById('raw-chain-title').value}" created successfully!`);
-  });
-
-  // Export functionality
-  exportBtn.addEventListener('click', async function() {
-    await AsyncOp.withErrorHandling(async () => {
-      const data = await Storage.exportData();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `prompthub-export-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      UIFeedback.showSuccess('Data exported successfully!');
-    }, 'Export Data');
-  });
-
-  // Import functionality
-  importBtn.addEventListener('click', function() {
-    importFile.click();
-  });
-
-  importFile.addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    await AsyncOp.withErrorHandling(async () => {
-      const text = await file.text();
-      const validation = SecurityUtils.validateJSON(text);
-      
-      if (!validation.valid) {
-        throw ErrorHandler.createError(
-          `Invalid JSON file: ${validation.error}`,
-          'INVALID_JSON'
-        );
-      }
-
-      const results = await Storage.importData(validation.data);
-      
-      // Create detailed feedback message
-      let message = 'Import completed:\n';
-      message += `• Prompts: ${results.prompts.imported} imported, ${results.prompts.skipped} skipped\n`;
-      message += `• Chains: ${results.chains.imported} imported, ${results.chains.skipped} skipped\n`;
-      message += `• Selectors: ${results.domainSelectors.imported} imported, ${results.domainSelectors.skipped} skipped`;
-      
-      if (results.prompts.errors.length > 0 || 
-          results.chains.errors.length > 0 || 
-          results.domainSelectors.errors.length > 0) {
-        UIFeedback.showWarning(message);
-        ErrorHandler.logError(
-          new Error('Import had errors: ' + JSON.stringify(results)),
-          'Import Data'
-        );
-      } else {
-        UIFeedback.showSuccess(message);
-      }
-      
-      await Promise.all([loadPrompts(), loadChains()]);
-    }, 'Import Data');
-
-    // Reset file input
-    e.target.value = '';
-  });
-
-  // Refresh functionality
-  refreshBtn.addEventListener('click', async function() {
-    await AsyncOp.withUserFeedback(async () => {
-      setLoadingState(true);
-      await Promise.all([loadPrompts(), loadChains()]);
-    }, 'Refresh Data', 'Data refreshed!');
-    setLoadingState(false);
-  });
-
-  // Initial load
-  await AsyncOp.withErrorHandling(async () => {
-    setLoadingState(true);
-    await Promise.all([loadPrompts(), loadChains()]);
-  }, 'Initial Load');
-  setLoadingState(false);
-
-  // Initialize Feather icons after initial load
-  setTimeout(initializeIcons, 100);
-
-  // Utility functions with enhanced error handling
-
-  async function loadPrompts(query = '') {
-    try {
-      const prompts = query ? await Storage.searchPrompts(query) : await Storage.getPrompts();
-      renderPromptsList(prompts);
-      // Initialize icons after rendering
-      setTimeout(initializeIcons, 10);
-    } catch (error) {
-      ErrorHandler.logError(error, 'Load Prompts');
-      UIFeedback.showError('Failed to load prompts');
-      renderPromptsList([]); // Show empty list on error
-    }
-  }
-
-  async function loadChains(query = '') {
-    try {
-      const chains = query ? await Storage.searchChains(query) : await Storage.getChains();
-      await renderChainsList(chains);
-      // Initialize icons after rendering
-      setTimeout(initializeIcons, 10);
-    } catch (error) {
-      ErrorHandler.logError(error, 'Load Chains');
-      UIFeedback.showError('Failed to load chains');
-      renderChainsList([]); // Show empty list on error
-    }
-  }
-
-  function renderPromptsList(prompts) {
-    try {
-      if (!promptsList) {
-        throw new Error('Prompts list container not found');
-      }
-
-      // Clear existing content
-      promptsList.innerHTML = '';
-      
-      if (prompts.length === 0) {
-        const emptyMsg = SecurityUtils.createSafeElement('p', 'No prompts found', 'empty-message');
-        promptsList.appendChild(emptyMsg);
-        return;
-      }
-      
+      // Create all prompt cards
       prompts.forEach(prompt => {
-        const promptElement = createPromptElement(prompt);
-        promptsList.appendChild(promptElement);
+        const promptCard = createPromptCard(prompt);
+        cardsContainer.appendChild(promptCard);
       });
-    } catch (error) {
-      ErrorHandler.logError(error, 'Render Prompts List');
-      promptsList.innerHTML = '<p class="error-message">Failed to display prompts</p>';
-    }
-  }
-
-  function createPromptElement(prompt) {
-    // Create main container
-    const listItem = SecurityUtils.createSafeElement('div', '', 'list-item');
-    
-    // Title
-    const title = SecurityUtils.createSafeElement('div', prompt.title, 'list-item-title');
-    
-    // Description (truncated content)
-    const truncatedContent = prompt.content.length > 100 
-      ? prompt.content.substring(0, 100) + '...' 
-      : prompt.content;
-    const desc = SecurityUtils.createSafeElement('div', truncatedContent, 'list-item-desc');
-    
-    // Actions container
-    const actions = SecurityUtils.createSafeElement('div', '', 'list-item-actions');
-    
-    // Insert button
-    const insertBtn = createActionButton('Insert', 'insert-btn', 'arrow-down', () => insertPrompt(prompt.id));
-    
-    // Copy button
-    const copyBtn = createActionButton('Copy', 'copy-btn', 'copy', () => copyToClipboard(prompt.content, 'Prompt'));
-    
-    // Edit button
-    const editBtn = createActionButton('Edit', 'edit-btn', 'edit-2', () => editPrompt(prompt.id));
-    
-    // Delete button
-    const deleteBtn = createActionButton('Delete', 'delete-btn', 'trash-2', () => deletePrompt(prompt.id));
-    
-    // Assemble element
-    actions.appendChild(insertBtn);
-    actions.appendChild(copyBtn);
-    actions.appendChild(editBtn);
-    actions.appendChild(deleteBtn);
-    
-    listItem.appendChild(title);
-    listItem.appendChild(desc);
-    listItem.appendChild(actions);
-    
-    return listItem;
-  }
-
-  async function renderChainsList(chains) {
-    try {
-      if (!chainsList) {
-        throw new Error('Chains list container not found');
-      }
-
-      // Clear existing content
-      chainsList.innerHTML = '';
       
-      if (chains.length === 0) {
-        const emptyMsg = SecurityUtils.createSafeElement('p', 'No chains found', 'empty-message');
-        chainsList.appendChild(emptyMsg);
-        return;
-      }
-      
-      // Get all prompts for chain rendering
-      const prompts = await Storage.getPrompts();
-      const promptsMap = new Map(prompts.map(p => [p.id, p]));
-      
+      // Create all chain cards
       chains.forEach(chain => {
-        const chainElement = createChainElement(chain, promptsMap);
-        chainsList.appendChild(chainElement);
+        const chainCard = createChainCard(chain, promptsMap);
+        cardsContainer.appendChild(chainCard);
       });
+      
     } catch (error) {
-      ErrorHandler.logError(error, 'Render Chains List');
-      chainsList.innerHTML = '<p class="error-message">Failed to display chains</p>';
+      ErrorHandler.logError(error, 'Render All Items');
+      cardsContainer.innerHTML = '<div class="error-message">Failed to display items</div>';
     }
   }
 
-  function createChainElement(chain, promptsMap) {
-    // Create main container
-    const listItem = SecurityUtils.createSafeElement('div', '', 'list-item chain-item');
-    
-    // Header with title and actions
-    const header = SecurityUtils.createSafeElement('div', '', 'chain-header');
-    
-    const title = SecurityUtils.createSafeElement('div', chain.title, 'list-item-title');
-    const stepCount = SecurityUtils.createSafeElement('span', 
-      `${chain.steps.length} step${chain.steps.length !== 1 ? 's' : ''}`, 
-      'step-count'
-    );
-    
-    // Actions container
-    const actions = SecurityUtils.createSafeElement('div', '', 'list-item-actions');
-    
-    // Insert button (starts the chain)
-    const insertBtn = createActionButton('Start', 'insert-btn', 'play', () => insertChain(chain.id));
-    
-    // Copy button (copies all chain content)
-    const copyBtn = createActionButton('Copy All', 'copy-btn', 'copy', () => copyChainContent(chain, promptsMap));
-    
-    // Edit button
-    const editBtn = createActionButton('Edit', 'edit-btn', 'edit-2', () => editChain(chain.id));
-    
-    // Delete button
-    const deleteBtn = createActionButton('Delete', 'delete-btn', 'trash-2', () => deleteChain(chain.id));
-    
-    actions.appendChild(insertBtn);
-    actions.appendChild(copyBtn);
-    actions.appendChild(editBtn);
-    actions.appendChild(deleteBtn);
-    
-    header.appendChild(title);
-    header.appendChild(stepCount);
-    header.appendChild(actions);
-    
-    // Steps preview
-    const stepsPreview = SecurityUtils.createSafeElement('div', '', 'chain-steps-preview');
-    
-    chain.steps.forEach((stepId, index) => {
-      const prompt = promptsMap.get(stepId);
-      if (prompt) {
-        const stepElement = createStepPreviewElement(prompt, index + 1, chain.id, index);
-        stepsPreview.appendChild(stepElement);
-      } else {
-        // Handle missing prompt
-        const stepElement = SecurityUtils.createSafeElement('div', '', 'chain-step-preview error');
-        const stepTitle = SecurityUtils.createSafeElement('span', 'Missing Prompt', 'step-title');
-        stepElement.appendChild(stepTitle);
-        stepsPreview.appendChild(stepElement);
-      }
-    });
-    
-    listItem.appendChild(header);
-    listItem.appendChild(stepsPreview);
-    
-    return listItem;
+  // Render empty state
+  function renderEmptyState() {
+    cardsContainer.innerHTML = `
+      <div class="empty-state">
+        <h3>No prompts or chains yet</h3>
+        <p>Get started by creating your first prompt or chain using the buttons above.</p>
+      </div>
+    `;
   }
 
-  function createStepPreviewElement(prompt, stepNumber, chainId, stepIndex) {
-    const stepElement = SecurityUtils.createSafeElement('div', '', 'chain-step-preview');
-    
-    const stepNum = SecurityUtils.createSafeElement('span', stepNumber.toString(), 'step-number');
-    const stepTitle = SecurityUtils.createSafeElement('span', prompt.title, 'step-title');
-    
-    // Action buttons container
-    const stepActions = SecurityUtils.createSafeElement('div', '', 'step-actions');
-    
-    const insertStepBtn = createActionButton('Insert', 'step-insert-btn', 'arrow-down', () => insertChainStep(chainId, stepIndex));
-    const copyStepBtn = createActionButton('Copy', 'step-insert-btn', 'copy', () => copyToClipboard(prompt.content, 'Step'));
-    
-    stepActions.appendChild(insertStepBtn);
-    stepActions.appendChild(copyStepBtn);
-    
-    stepElement.appendChild(stepNum);
-    stepElement.appendChild(stepTitle);
-    stepElement.appendChild(stepActions);
-    
-    return stepElement;
-  }
-
-  // Copy entire chain content
-  async function copyChainContent(chain, promptsMap) {
-    try {
-      const validSteps = chain.steps
-        .map(stepId => promptsMap.get(stepId))
-        .filter(prompt => prompt);
-      
-      if (validSteps.length === 0) {
-        UIFeedback.showWarning('No valid steps found in chain');
-        return;
-      }
-      
-      const chainContent = validSteps
-        .map((prompt, index) => `Step ${index + 1}: ${prompt.title}\n${prompt.content}`)
-        .join('\n\n---\n\n');
-      
-      await copyToClipboard(chainContent, 'Chain');
-    } catch (error) {
-      ErrorHandler.logError(error, 'Copy Chain Content');
-      UIFeedback.showError('Failed to copy chain content');
-    }
-  }
-
+  // Action functions
   async function insertPrompt(id) {
     await AsyncOp.withUserFeedback(async () => {
       const prompt = await Storage.getPromptById(id);
@@ -679,7 +361,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         throw ErrorHandler.createError('Chain has no steps', 'EMPTY_CHAIN');
       }
       
-      // Insert first step
       await insertChainStep(id, 0);
     }, 'Start Chain', 'Chain started successfully!');
   }
@@ -722,7 +403,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         );
       }
       
-      // Store current chain state for future steps
       await chrome.storage.local.set({
         currentChain: {
           id: chainId,
@@ -730,6 +410,37 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
       });
     }, 'Insert Chain Step', `Step ${stepIndex + 1} inserted successfully!`);
+  }
+
+  async function copyChainContent(chainId) {
+    try {
+      const chain = await Storage.getChainById(chainId);
+      if (!chain) {
+        UIFeedback.showError('Chain not found');
+        return;
+      }
+      
+      const allPrompts = await Storage.getPrompts();
+      const promptsMap = new Map(allPrompts.map(p => [p.id, p]));
+      
+      const validSteps = chain.steps
+        .map(stepId => promptsMap.get(stepId))
+        .filter(prompt => prompt);
+      
+      if (validSteps.length === 0) {
+        UIFeedback.showWarning('No valid steps found in chain');
+        return;
+      }
+      
+      const chainContent = validSteps
+        .map((prompt, index) => `Step ${index + 1}: ${prompt.title}\n${prompt.content}`)
+        .join('\n\n---\n\n');
+      
+      await copyToClipboard(chainContent, 'Chain');
+    } catch (error) {
+      ErrorHandler.logError(error, 'Copy Chain Content');
+      UIFeedback.showError('Failed to copy chain content');
+    }
   }
 
   async function editPrompt(id) {
@@ -745,6 +456,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.getElementById('prompt-title').value = prompt.title;
       document.getElementById('prompt-content').value = prompt.content;
       promptDialog.style.display = 'block';
+      setTimeout(initializeIcons, 10);
     } catch (error) {
       ErrorHandler.logError(error, 'Edit Prompt');
       UIFeedback.showError('Failed to load prompt for editing');
@@ -763,7 +475,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.getElementById('chain-id').value = chain.id;
       document.getElementById('chain-title').value = chain.title;
       
-      // Load chain steps
       const stepsContainer = document.getElementById('chain-steps');
       stepsContainer.innerHTML = '';
       
@@ -783,6 +494,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       
       await loadPromptSelector();
       chainDialog.style.display = 'block';
+      setTimeout(initializeIcons, 10);
     } catch (error) {
       ErrorHandler.logError(error, 'Edit Chain');
       UIFeedback.showError('Failed to load chain for editing');
@@ -796,7 +508,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     await AsyncOp.withUserFeedback(async () => {
       await Storage.deletePrompt(id);
-      await loadPrompts();
+      await loadAllItems();
     }, 'Delete Prompt', 'Prompt deleted successfully!');
   }
 
@@ -807,16 +519,260 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     await AsyncOp.withUserFeedback(async () => {
       await Storage.deleteChain(id);
-      await loadChains();
+      await loadAllItems();
     }, 'Delete Chain', 'Chain deleted successfully!');
   }
 
+  // Dialog and form event handlers (keeping existing functionality)
+  document.querySelectorAll('.close-btn, .cancel-btn').forEach(elem => {
+    elem.addEventListener('click', function() {
+      closeAllDialogs();
+    });
+  });
+  
+  window.addEventListener('click', function(event) {
+    if (event.target === promptDialog || 
+        event.target === chainDialog || 
+        event.target === rawChainDialog) {
+      closeAllDialogs();
+    }
+  });
+
+  function closeAllDialogs() {
+    promptDialog.style.display = 'none';
+    chainDialog.style.display = 'none';
+    rawChainDialog.style.display = 'none';
+    UIFeedback.clearMessages();
+  }
+  
+  // Button event listeners
+  addPromptBtn.addEventListener('click', function() {
+    try {
+      document.getElementById('prompt-dialog-title').textContent = 'Add New Prompt';
+      document.getElementById('prompt-id').value = '';
+      document.getElementById('prompt-title').value = '';
+      document.getElementById('prompt-content').value = '';
+      promptDialog.style.display = 'block';
+      setTimeout(initializeIcons, 10);
+    } catch (error) {
+      ErrorHandler.logError(error, 'Add Prompt Dialog');
+      UIFeedback.showError('Failed to open add prompt dialog');
+    }
+  });
+
+  addChainBtn.addEventListener('click', async function() {
+    try {
+      document.getElementById('chain-dialog-title').textContent = 'Create New Chain';
+      document.getElementById('chain-id').value = '';
+      document.getElementById('chain-title').value = '';
+      document.getElementById('chain-steps').innerHTML = '<p class="empty-message">No steps added yet</p>';
+      
+      await loadPromptSelector();
+      chainDialog.style.display = 'block';
+      setTimeout(initializeIcons, 10);
+    } catch (error) {
+      ErrorHandler.logError(error, 'Add Chain Dialog');
+      UIFeedback.showError('Failed to open add chain dialog');
+    }
+  });
+
+  addRawChainBtn.addEventListener('click', function() {
+    try {
+      document.getElementById('raw-chain-title').value = '';
+      document.getElementById('raw-content').value = '';
+      rawChainDialog.style.display = 'block';
+      setTimeout(initializeIcons, 10);
+    } catch (error) {
+      ErrorHandler.logError(error, 'Add Raw Chain Dialog');
+      UIFeedback.showError('Failed to open raw chain dialog');
+    }
+  });
+
+  // Form submissions
+  promptForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    await AsyncOp.withUserFeedback(async () => {
+      const id = document.getElementById('prompt-id').value;
+      const title = document.getElementById('prompt-title').value;
+      const content = document.getElementById('prompt-content').value;
+      
+      const prompt = {
+        id: id || undefined,
+        title,
+        content
+      };
+      
+      await Storage.savePrompt(prompt);
+      closeAllDialogs();
+      await loadAllItems();
+    }, 'Save Prompt', 'Prompt saved successfully!');
+  });
+
+  chainForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    await AsyncOp.withUserFeedback(async () => {
+      const id = document.getElementById('chain-id').value;
+      const title = document.getElementById('chain-title').value;
+      
+      const steps = [];
+      document.querySelectorAll('.chain-step').forEach(step => {
+        steps.push(step.dataset.promptId);
+      });
+      
+      const chain = {
+        id: id || undefined,
+        title,
+        steps
+      };
+      
+      await Storage.saveChain(chain);
+      closeAllDialogs();
+      await loadAllItems();
+    }, 'Save Chain', 'Chain saved successfully!');
+  });
+
+  rawChainForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    await AsyncOp.withUserFeedback(async () => {
+      const chainTitle = document.getElementById('raw-chain-title').value.trim();
+      const rawContent = document.getElementById('raw-content').value.trim();
+      
+      if (!chainTitle) {
+        throw ErrorHandler.createError('Chain title is required', 'MISSING_TITLE');
+      }
+      
+      if (!rawContent) {
+        throw ErrorHandler.createError('Content is required', 'MISSING_CONTENT');
+      }
+      
+      const delimiterRegex = /\n---\n/g;
+      const promptTexts = rawContent.split(delimiterRegex);
+      
+      if (promptTexts.length === 0) {
+        throw ErrorHandler.createError(
+          'No valid content found. Please check the format.',
+          'INVALID_FORMAT'
+        );
+      }
+      
+      const promptIds = [];
+      for (let i = 0; i < promptTexts.length; i++) {
+        const promptText = promptTexts[i].trim();
+        if (!promptText) continue;
+        
+        const lines = promptText.split('\n');
+        const promptTitle = lines[0].trim() || `${chainTitle} - Step ${i + 1}`;
+        const promptContent = lines.slice(1).join('\n').trim();
+        
+        if (!promptContent) continue;
+        
+        const prompt = {
+          title: promptTitle,
+          content: promptContent
+        };
+        
+        const savedPrompt = await Storage.savePrompt(prompt);
+        promptIds.push(savedPrompt.id);
+      }
+      
+      if (promptIds.length === 0) {
+        throw ErrorHandler.createError(
+          'No valid prompts were created. Please check your input format.',
+          'NO_PROMPTS_CREATED'
+        );
+      }
+      
+      const chain = {
+        title: chainTitle,
+        steps: promptIds
+      };
+      
+      await Storage.saveChain(chain);
+      closeAllDialogs();
+      await loadAllItems();
+    }, 'Create Raw Chain', `Chain "${document.getElementById('raw-chain-title').value}" created successfully!`);
+  });
+
+  // Export/Import/Refresh functionality
+  exportBtn.addEventListener('click', async function() {
+    await AsyncOp.withErrorHandling(async () => {
+      const data = await Storage.exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prompthub-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      UIFeedback.showSuccess('Data exported successfully!');
+    }, 'Export Data');
+  });
+
+  importBtn.addEventListener('click', function() {
+    importFile.click();
+  });
+
+  importFile.addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    await AsyncOp.withErrorHandling(async () => {
+      const text = await file.text();
+      const validation = SecurityUtils.validateJSON(text);
+      
+      if (!validation.valid) {
+        throw ErrorHandler.createError(
+          `Invalid JSON file: ${validation.error}`,
+          'INVALID_JSON'
+        );
+      }
+
+      const results = await Storage.importData(validation.data);
+      
+      let message = 'Import completed:\n';
+      message += `• Prompts: ${results.prompts.imported} imported, ${results.prompts.skipped} skipped\n`;
+      message += `• Chains: ${results.chains.imported} imported, ${results.chains.skipped} skipped\n`;
+      message += `• Selectors: ${results.domainSelectors.imported} imported, ${results.domainSelectors.skipped} skipped`;
+      
+      if (results.prompts.errors.length > 0 || 
+          results.chains.errors.length > 0 || 
+          results.domainSelectors.errors.length > 0) {
+        UIFeedback.showWarning(message);
+        ErrorHandler.logError(
+          new Error('Import had errors: ' + JSON.stringify(results)),
+          'Import Data'
+        );
+      } else {
+        UIFeedback.showSuccess(message);
+      }
+      
+      await loadAllItems();
+    }, 'Import Data');
+
+    e.target.value = '';
+  });
+
+  refreshBtn.addEventListener('click', async function() {
+    await AsyncOp.withUserFeedback(async () => {
+      setLoadingState(true);
+      await loadAllItems();
+    }, 'Refresh Data', 'Data refreshed!');
+    setLoadingState(false);
+  });
+
+  // Helper functions for chain building (keeping existing functionality)
   async function loadPromptSelector() {
     try {
       const prompts = await Storage.getPrompts();
       const selector = document.getElementById('prompt-selector');
       
-      // Clear existing options except the first one
       const firstOption = selector.querySelector('option[value=""]');
       selector.innerHTML = '';
       if (firstOption) {
@@ -842,18 +798,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
       const stepsContainer = document.getElementById('chain-steps');
       
-      // Remove empty message if it exists
       const emptyMessage = stepsContainer.querySelector('.empty-message');
       if (emptyMessage) {
         emptyMessage.remove();
       }
       
-      // Create step element
       const stepElement = SecurityUtils.createSafeElement('div', '', 'chain-step');
       stepElement.dataset.promptId = promptId;
       stepElement.draggable = true;
       
-      // Step content
       const stepContent = SecurityUtils.createSafeElement('div', '', 'step-content');
       const dragHandle = SecurityUtils.createSafeElement('span', '⋮⋮', 'drag-handle');
       const stepTitle = SecurityUtils.createSafeElement('span', promptTitle, 'step-title');
@@ -864,21 +817,12 @@ document.addEventListener('DOMContentLoaded', async function() {
       stepContent.appendChild(removeBtn);
       stepElement.appendChild(stepContent);
       
-      // Event listeners
       removeBtn.addEventListener('click', () => {
         stepElement.remove();
         if (stepsContainer.children.length === 0) {
           stepsContainer.innerHTML = '<p class="empty-message">No steps added yet</p>';
         }
       });
-      
-      // Drag and drop handlers
-      stepElement.addEventListener('dragstart', handleDragStart);
-      stepElement.addEventListener('dragover', handleDragOver);
-      stepElement.addEventListener('dragenter', handleDragEnter);
-      stepElement.addEventListener('dragleave', handleDragLeave);
-      stepElement.addEventListener('drop', handleDrop);
-      stepElement.addEventListener('dragend', handleDragEnd);
       
       stepsContainer.appendChild(stepElement);
     } catch (error) {
@@ -887,52 +831,33 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
-  // Drag and drop functions
-  let draggedElement = null;
-
-  function handleDragStart(e) {
-    draggedElement = this;
-    this.style.opacity = '0.5';
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault();
-    return false;
-  }
-
-  function handleDragEnter(e) {
-    this.classList.add('over');
-  }
-
-  function handleDragLeave(e) {
-    this.classList.remove('over');
-  }
-
-  function handleDrop(e) {
-    e.preventDefault();
-    
-    if (draggedElement !== this) {
-      const stepsContainer = document.getElementById('chain-steps');
-      const allSteps = [...stepsContainer.children];
-      const draggedIndex = allSteps.indexOf(draggedElement);
-      const targetIndex = allSteps.indexOf(this);
+  document.getElementById('add-step-btn').addEventListener('click', async function() {
+    try {
+      const selector = document.getElementById('prompt-selector');
+      const promptId = selector.value;
       
-      if (draggedIndex < targetIndex) {
-        stepsContainer.insertBefore(draggedElement, this.nextSibling);
-      } else {
-        stepsContainer.insertBefore(draggedElement, this);
+      if (!promptId) {
+        UIFeedback.showWarning('Please select a prompt to add');
+        return;
       }
+      
+      const promptText = selector.options[selector.selectedIndex].text;
+      addStepToChainBuilder(promptId, promptText);
+      
+      selector.value = '';
+    } catch (error) {
+      ErrorHandler.logError(error, 'Add Step to Chain');
+      UIFeedback.showError('Failed to add step to chain');
     }
-    
-    this.classList.remove('over');
-    return false;
-  }
+  });
 
-  function handleDragEnd(e) {
-    this.style.opacity = '';
-    document.querySelectorAll('.chain-step').forEach(step => {
-      step.classList.remove('over');
-    });
-    draggedElement = null;
-  }
+  // Initial load
+  await AsyncOp.withErrorHandling(async () => {
+    setLoadingState(true);
+    await loadAllItems();
+  }, 'Initial Load');
+  setLoadingState(false);
+
+  // Initialize Feather icons after initial load
+  setTimeout(initializeIcons, 100);
 }); 

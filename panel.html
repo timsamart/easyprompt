@@ -3,8 +3,6 @@
 <head>
   <title>PromptHub</title>
   <link rel="stylesheet" href="panel-styles.css">
-  <!-- Feather Icons -->
-  <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
   <header>
@@ -36,36 +34,27 @@
   
   <!-- Main Content Container -->
   <div class="content-container">
-    <!-- Prompts Section -->
-    <div class="section">
-      <h2 class="section-title">Prompts</h2>
-      <div id="prompts-list" class="list-container">
-        <!-- Prompts will be inserted here by JavaScript -->
-      </div>
-      <div class="buttons-container">
-        <button id="add-prompt-btn" class="add-btn">
+    <div class="content-header">
+      <h2>Your Library</h2>
+      <div class="add-buttons">
+        <button id="add-prompt-btn" class="add-btn prompt-add">
           <i data-feather="plus"></i>
-          Add New Prompt
+          New Prompt
+        </button>
+        <button id="add-chain-btn" class="add-btn chain-add">
+          <i data-feather="link"></i>
+          New Chain
+        </button>
+        <button id="add-raw-chain-btn" class="add-btn chain-add secondary">
+          <i data-feather="edit-3"></i>
+          From Text
         </button>
       </div>
     </div>
     
-    <!-- Chains Section -->
-    <div class="section">
-      <h2 class="section-title">Chains</h2>
-      <div id="chains-list" class="list-container">
-        <!-- Chains will be inserted here by JavaScript -->
-      </div>
-      <div class="buttons-container">
-        <button id="add-chain-btn" class="add-btn">
-          <i data-feather="plus"></i>
-          Create New Chain
-        </button>
-        <button id="add-raw-chain-btn" class="add-btn secondary">
-          <i data-feather="edit-3"></i>
-          Create from Text
-        </button>
-      </div>
+    <!-- Unified Cards Container -->
+    <div id="cards-container" class="cards-grid">
+      <!-- Cards will be inserted here by JavaScript -->
     </div>
   </div>
   
@@ -171,5 +160,18 @@
   <script src="storage.js"></script>
   <script src="utils.js"></script>
   <script src="panel.js"></script>
+  
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    // Initialize Feather icons when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        if (typeof feather !== 'undefined') {
+          feather.replace();
+        }
+      }, 200);
+    });
+  </script>
 </body>
 </html> 
