@@ -283,7 +283,9 @@
       toast.className = `message message-${type}`;
       toast.innerHTML = `
         <span>${escapeHtml(message)}</span>
-        <button class="message-close" onclick="this.parentElement.remove()">×</button>
+        <button class="message-close" onclick="this.parentElement.remove()">
+          <i data-feather="x"></i>
+        </button>
       `;
       document.body.appendChild(toast);
       

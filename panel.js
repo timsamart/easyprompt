@@ -1007,7 +1007,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       const stepContent = SecurityUtils.createSafeElement('div', '', 'step-content');
       const dragHandle = SecurityUtils.createSafeElement('span', '⋮⋮', 'drag-handle');
       const stepTitle = SecurityUtils.createSafeElement('span', promptTitle, 'step-title');
-      const removeBtn = SecurityUtils.createSafeElement('button', '×', 'remove-step');
+      const removeBtn = SecurityUtils.createSafeElement('button', '', 'remove-step');
+      removeBtn.innerHTML = '<i data-feather="x"></i>';
       
       stepContent.appendChild(dragHandle);
       stepContent.appendChild(stepTitle);
