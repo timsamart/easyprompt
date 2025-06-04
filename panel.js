@@ -1023,6 +1023,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       });
       
       stepsContainer.appendChild(stepElement);
+      
+      // Initialize icons for the newly added element
+      setTimeout(initializeIcons, 10);
     } catch (error) {
       ErrorHandler.logError(error, 'Add Step to Chain Builder');
       UIFeedback.showError('Failed to add step to chain');

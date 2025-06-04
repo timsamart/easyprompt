@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Test</title>
+    <link rel="stylesheet" href="panel-styles.css">
+</head>
+<body>
+    <h1>Icon and Chain Test</h1>
+    
+    <!-- Test Icons -->
+    <div style="margin: 20px;">
+        <h2>Icon Test:</h2>
+        <button class="message-close" onclick="alert('Close clicked!')">
+            <i data-feather="x"></i> Close
+        </button>
+        
+        <button class="remove-step" onclick="alert('Remove clicked!')">
+            <i data-feather="x"></i> Remove
+        </button>
+    </div>
+    
+    <!-- Test Chain -->
+    <div style="margin: 20px;">
+        <h2>Chain Expansion Test:</h2>
+        <div class="card chain-card" id="test-chain" style="max-width: 400px;">
+            <button class="expand-btn" onclick="toggleTestChain()">
+                <i data-feather="chevron-down"></i>
+            </button>
+            <div class="card-header">
+                <div class="card-icon">
+                    <i data-feather="link"></i>
+                    <div class="step-dots">3</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Sample Chain</h3>
+                    <p class="card-description">3 steps • Click arrow to expand</p>
+                </div>
+            </div>
+            <div class="chain-steps">
+                <div class="chain-step-item">
+                    <div class="step-number-badge">1</div>
+                    <div class="step-title">First Step - Email Draft</div>
+                </div>
+                <div class="chain-step-item">
+                    <div class="step-number-badge">2</div>
+                    <div class="step-title">Second Step - Follow Up</div>
+                </div>
+                <div class="chain-step-item">
+                    <div class="step-number-badge">3</div>
+                    <div class="step-title">Third Step - Signature</div>
+                </div>
+                <div class="chain-step-item">
+                    <div class="step-number-badge">4</div>
+                    <div class="step-title">Fourth Step - Additional Info</div>
+                </div>
+                <div class="chain-step-item">
+                    <div class="step-number-badge">5</div>
+                    <div class="step-title">Fifth Step - Final Notes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="feather.min.js"></script>
+    <script>
+        function toggleTestChain() {
+            const chain = document.getElementById('test-chain');
+            chain.classList.toggle('expanded');
+            
+            // Re-initialize icons after toggle
+            setTimeout(() => {
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+            }, 10);
+        }
+        
+        // Initialize icons on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                    console.log('✅ Icons initialized');
+                } else {
+                    console.error('❌ Feather not loaded');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html> 

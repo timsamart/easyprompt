@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PromptHub Debug Test</title>
+  <link rel="stylesheet" href="panel-styles.css">
+  <style>
+    .debug-info {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #fff;
+      border: 2px solid #333;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 9999;
+      max-width: 300px;
+    }
+    .test-section {
+      margin: 20px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="debug-info" id="debug">
+    <h4>Debug Info:</h4>
+    <div id="debug-content">Loading...</div>
+  </div>
+
+  <div class="test-section">
+    <h2>🔧 Icon Test</h2>
+    <p>Close button with Feather icon:</p>
+    <button class="message-close">
+      <i data-feather="x"></i>
+    </button>
+    
+    <p>Remove step button:</p>
+    <button class="remove-step">
+      <i data-feather="x"></i>
+    </button>
+  </div>
+
+  <div class="test-section">
+    <h2>📋 Chain Expansion Test</h2>
+    <div class="card chain-card" id="test-chain">
+      <button class="expand-btn" onclick="toggleChain()">
+        <i data-feather="chevron-down"></i>
+      </button>
+      <div class="card-header">
+        <div class="card-icon">
+          <i data-feather="link"></i>
+          <div class="step-dots">3</div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Test Chain</h3>
+          <p class="card-description">3 steps • Click to expand and view steps</p>
+        </div>
+      </div>
+      <div class="chain-steps">
+        <div class="chain-step-item">
+          <div class="step-number-badge">1</div>
+          <div class="step-title">First Step</div>
+        </div>
+        <div class="chain-step-item">
+          <div class="step-number-badge">2</div>
+          <div class="step-title">Second Step</div>
+        </div>
+        <div class="chain-step-item">
+          <div class="step-number-badge">3</div>
+          <div class="step-title">Third Step</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feather Icons -->
+  <script src="feather.min.js"></script>
+  
+  <script>
+    function updateDebug() {
+      const debugContent = document.getElementById('debug-content');
+      const info = [];
+      
+      // Check if Feather is loaded
+      info.push(`Feather loaded: ${typeof feather !== 'undefined' ? '✅' : '❌'}`);
+      
+      // Check icon elements
+      const xIcons = document.querySelectorAll('[data-feather="x"]').length;
+      info.push(`X icons found: ${xIcons}`);
+      
+      // Check chain expansion
+      const chainSteps = document.querySelector('.chain-steps');
+      const computedStyle = window.getComputedStyle(chainSteps);
+      info.push(`Chain max-height: ${computedStyle.maxHeight}`);
+      info.push(`Chain overflow: ${computedStyle.overflow}`);
+      
+      // Check for rendered icons
+      const renderedIcons = document.querySelectorAll('svg').length;
+      info.push(`Rendered SVGs: ${renderedIcons}`);
+      
+      debugContent.innerHTML = info.join('<br>');
+    }
+    
+    function toggleChain() {
+      const chain = document.getElementById('test-chain');
+      chain.classList.toggle('expanded');
+      
+      setTimeout(() => {
+        if (typeof feather !== 'undefined') {
+          feather.replace();
+        }
+        updateDebug();
+      }, 100);
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        if (typeof feather !== 'undefined') {
+          feather.replace();
+          console.log('✅ Feather icons initialized');
+        } else {
+          console.error('❌ Feather not available');
+        }
+        updateDebug();
+      }, 100);
+    });
+    
+    // Additional initialization after a delay
+    setTimeout(() => {
+      if (typeof feather !== 'undefined') {
+        feather.replace();
+      }
+      updateDebug();
+    }, 500);
+  </script>
+</body>
+</html> 
