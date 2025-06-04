@@ -263,21 +263,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
-  // Generate deterministic icon class based on content (like Gravatar)
+  // Generate deterministic icon using PixelArtGen
   function getPromptIcon(title, content = '') {
-    // Create a simple hash from title and content
-    const text = (title + content).toLowerCase();
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+    if (typeof PixelArtGen === 'undefined') {
+      console.error('PixelArtGen not loaded. Cannot generate icon.');
+      // Fallback to a simple div or a default icon class if PixelArtGen is not available
+      return '<div class="card-icon-fallback">!</div>'; 
     }
-    
-    // Convert to positive number and get icon number (1-12)
-    const iconCount = 12;
-    const iconNum = (Math.abs(hash) % iconCount) + 1;
-    return `prompt-icon-${iconNum}`;
+    const text = (title + content).toLowerCase();
+    const generator = new PixelArtGen({
+      size: 8, // Keep it small for an icon
+      complexity: 2, // Default complexity
+      // Using a fixed, vibrant palette for consistency and visual appeal
+      palette: ['#000000', '#1D2B53', '#7E2553', '#008751', '#AB5236', '#5F574F', '#C2C3C7', '#FFF1E8', '#FF004D', '#FFA300', '#FFEC27', '#00E436', '#29ADFF', '#83769C', '#FF77A8', '#FFCCAA'],
+      scale: 1 // Scale will be handled by CSS if needed, generate 1:1 pixel SVG
+    });
+    return generator.toSVG(text);
   }
 
   // Create prompt card
@@ -285,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const card = SecurityUtils.createSafeElement('div', '', 'card prompt-card');
     card.dataset.id = prompt.id;
     
-    const iconClass = getPromptIcon(prompt.title, prompt.content);
+    const iconSVG = getPromptIcon(prompt.title, prompt.content);
     
     card.innerHTML = `
       <div class="card-actions">
@@ -304,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       </div>
       <div class="card-main">
         <div class="card-header">
-          <div class="card-icon ${iconClass}"></div>
+          <div class="card-icon">${iconSVG}</div>
           <div class="card-content">
             <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
             <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
