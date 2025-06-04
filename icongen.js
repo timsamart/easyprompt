@@ -90,17 +90,15 @@ class PixelArtGen {
     // Generate as SVG string
     toSVG(text) {
         const pixels = this.generate(text);
-        const svgSize = this.size * this.scale;
+        const svgSize = this.size; // Use the grid size for viewBox
         
-        let svg = `<svg width="${svgSize}" height="${svgSize}" xmlns="http://www.w3.org/2000/svg">`;
+        let svg = `<svg viewBox="0 0 ${svgSize} ${svgSize}" xmlns="http://www.w3.org/2000/svg">`;
         svg += `<rect width="100%" height="100%" fill="#000000"/>`;
         
         for (let y = 0; y < this.size; y++) {
             for (let x = 0; x < this.size; x++) {
                 if (pixels[y][x]) {
-                    const px = x * this.scale;
-                    const py = y * this.scale;
-                    svg += `<rect x="${px}" y="${py}" width="${this.scale}" height="${this.scale}" fill="${pixels[y][x]}"/>`;
+                    svg += `<rect x="${x}" y="${y}" width="1" height="1" fill="${pixels[y][x]}"/>`;
                 }
             }
         }
