@@ -296,7 +296,7 @@ h1::before {
 .card {
   background: var(--surface-color);
   border-radius: var(--radius-lg);
-  padding: var(--space-12);
+  padding: var(--space-8);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-light);
   transition: var(--transition);
@@ -305,7 +305,7 @@ h1::before {
   min-height: calc(160px * var(--scale-factor));
   max-height: calc(220px * var(--scale-factor));
   display: flex;
-  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .card::before {
@@ -322,6 +322,12 @@ h1::before {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: var(--primary-color);
+}
+
+/* Expanded chain cards */
+.chain-card.expanded {
+  max-height: none;
+  overflow: visible;
 }
 
 /* Prompt cards */
@@ -376,19 +382,21 @@ h1::before {
 
 .chain-card .step-dots {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -6px;
+  right: -6px;
   background: #8b5cf6;
   color: white;
   border-radius: 50%;
-  width: calc(16px * var(--scale-factor));
-  height: calc(16px * var(--scale-factor));
+  width: calc(18px * var(--scale-factor));
+  height: calc(18px * var(--scale-factor));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(9px * var(--scale-factor));
+  font-size: calc(10px * var(--scale-factor));
   font-weight: 700;
   box-shadow: var(--shadow-sm);
+  border: 2px solid white;
+  min-width: calc(18px * var(--scale-factor));
 }
 
 /* Card content */
@@ -426,33 +434,34 @@ h1::before {
   flex: 1;
 }
 
-/* Compact card actions */
+/* Card actions - vertical on left */
 .card-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--space-2);
-  margin-top: auto;
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border-light);
+  padding: 0;
+  border: none;
+  width: calc(32px * var(--scale-factor));
+  flex-shrink: 0;
 }
 
 .card-action-btn {
-  flex: 1;
-  padding: var(--space-2) var(--space-3);
-  font-size: calc(10px * var(--scale-factor));
+  width: calc(32px * var(--scale-factor));
+  height: calc(32px * var(--scale-factor));
+  padding: 0;
+  font-size: calc(14px * var(--scale-factor));
   font-weight: 600;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   background-color: var(--surface-color);
   color: var(--text-secondary);
   transition: var(--transition);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1);
-  min-height: calc(24px * var(--scale-factor));
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .card-action-btn:hover {
@@ -494,7 +503,7 @@ h1::before {
 }
 
 .chain-card.expanded .chain-steps {
-  max-height: calc(500px * var(--scale-factor)); /* Much larger to accommodate more steps */
+  max-height: calc(800px * var(--scale-factor)); /* Much larger to accommodate more steps */
   padding: var(--space-4) 0;
 }
 
@@ -554,6 +563,7 @@ h1::before {
   cursor: pointer;
   transition: var(--transition);
   color: #8b5cf6;
+  z-index: 10;
 }
 
 .expand-btn:hover {
@@ -568,6 +578,11 @@ h1::before {
 
 .chain-card.expanded .expand-btn i {
   transform: rotate(180deg);
+}
+
+/* Card main container positioning */
+.card-main {
+  position: relative;
 }
 
 /* Responsive breakpoints */
@@ -587,12 +602,14 @@ h1::before {
     justify-content: flex-start;
   }
   
-  .card-actions {
-    flex-wrap: wrap;
+  .card-action-btn {
+    width: calc(28px * var(--scale-factor));
+    height: calc(28px * var(--scale-factor));
+    font-size: calc(12px * var(--scale-factor));
   }
   
-  .card-action-btn {
-    min-width: calc(80px * var(--scale-factor));
+  .card-actions {
+    width: calc(28px * var(--scale-factor));
   }
 }
 

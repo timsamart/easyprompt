@@ -288,30 +288,28 @@ document.addEventListener('DOMContentLoaded', async function() {
     const iconClass = getPromptIcon(prompt.title, prompt.content);
     
     card.innerHTML = `
-      <div class="card-header">
-        <div class="card-icon ${iconClass}"></div>
-        <div class="card-content">
-          <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
-          <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
-        </div>
-      </div>
       <div class="card-actions">
-        <button class="card-action-btn primary" data-action="insert" data-id="${prompt.id}">
+        <button class="card-action-btn primary" data-action="insert" data-id="${prompt.id}" title="Insert">
           <i data-feather="arrow-down"></i>
-          Insert
         </button>
-        <button class="card-action-btn success" data-action="copy" data-content="${SecurityUtils.escapeHtml(prompt.content)}">
+        <button class="card-action-btn success" data-action="copy" data-content="${SecurityUtils.escapeHtml(prompt.content)}" title="Copy">
           <i data-feather="copy"></i>
-          Copy
         </button>
-        <button class="card-action-btn warning" data-action="edit" data-id="${prompt.id}">
+        <button class="card-action-btn warning" data-action="edit" data-id="${prompt.id}" title="Edit">
           <i data-feather="edit-2"></i>
-          Edit
         </button>
-        <button class="card-action-btn danger" data-action="delete" data-id="${prompt.id}">
+        <button class="card-action-btn danger" data-action="delete" data-id="${prompt.id}" title="Delete">
           <i data-feather="trash-2"></i>
-          Delete
         </button>
+      </div>
+      <div class="card-main">
+        <div class="card-header">
+          <div class="card-icon ${iconClass}"></div>
+          <div class="card-content">
+            <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
+            <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
+          </div>
+        </div>
       </div>
     `;
     
@@ -330,47 +328,45 @@ document.addEventListener('DOMContentLoaded', async function() {
     const validSteps = chain.steps.filter(stepId => promptsMap.has(stepId));
     
     card.innerHTML = `
-      <button class="expand-btn" data-action="toggle">
-        <i data-feather="chevron-down"></i>
-      </button>
-      <div class="card-header">
-        <div class="card-icon">
-          <i data-feather="link"></i>
-          <div class="step-dots">${stepCount}</div>
-        </div>
-        <div class="card-content">
-          <h3 class="card-title">${SecurityUtils.escapeHtml(chain.title)}</h3>
-          <p class="card-description">${stepCount} step${stepCount !== 1 ? 's' : ''} • Click to expand and view steps</p>
-        </div>
-      </div>
-      <div class="chain-steps">
-        ${validSteps.map((stepId, index) => {
-          const prompt = promptsMap.get(stepId);
-          return `
-            <div class="chain-step-item" data-action="insert-step" data-chain-id="${chain.id}" data-step-index="${index}">
-              <div class="step-number-badge">${index + 1}</div>
-              <div class="step-title">${SecurityUtils.escapeHtml(prompt.title)}</div>
-            </div>
-          `;
-        }).join('')}
-      </div>
       <div class="card-actions">
-        <button class="card-action-btn primary" data-action="start-chain" data-id="${chain.id}">
+        <button class="card-action-btn primary" data-action="start-chain" data-id="${chain.id}" title="Start Chain">
           <i data-feather="play"></i>
-          Start
         </button>
-        <button class="card-action-btn success" data-action="copy-chain" data-id="${chain.id}">
+        <button class="card-action-btn success" data-action="copy-chain" data-id="${chain.id}" title="Copy All">
           <i data-feather="copy"></i>
-          Copy All
         </button>
-        <button class="card-action-btn warning" data-action="edit" data-id="${chain.id}">
+        <button class="card-action-btn warning" data-action="edit" data-id="${chain.id}" title="Edit">
           <i data-feather="edit-2"></i>
-          Edit
         </button>
-        <button class="card-action-btn danger" data-action="delete" data-id="${chain.id}">
+        <button class="card-action-btn danger" data-action="delete" data-id="${chain.id}" title="Delete">
           <i data-feather="trash-2"></i>
-          Delete
         </button>
+      </div>
+      <div class="card-main">
+        <button class="expand-btn" data-action="toggle">
+          <i data-feather="chevron-down"></i>
+        </button>
+        <div class="card-header">
+          <div class="card-icon">
+            <i data-feather="link"></i>
+            <div class="step-dots">${stepCount}</div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">${SecurityUtils.escapeHtml(chain.title)}</h3>
+            <p class="card-description">${stepCount} step${stepCount !== 1 ? 's' : ''} • Click to expand and view steps</p>
+          </div>
+        </div>
+        <div class="chain-steps">
+          ${validSteps.map((stepId, index) => {
+            const prompt = promptsMap.get(stepId);
+            return `
+              <div class="chain-step-item" data-action="insert-step" data-chain-id="${chain.id}" data-step-index="${index}">
+                <div class="step-number-badge">${index + 1}</div>
+                <div class="step-title">${SecurityUtils.escapeHtml(prompt.title)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       </div>
     `;
     
