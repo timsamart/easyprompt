@@ -431,6 +431,22 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Toggle chain expansion
   function toggleChainExpansion(card) {
     card.classList.toggle('expanded');
+    
+    // Ensure icon rotation works properly
+    const expandBtn = card.querySelector('.expand-btn');
+    if (expandBtn) {
+      const icon = expandBtn.querySelector('i');
+      const svg = expandBtn.querySelector('svg');
+      
+      if (card.classList.contains('expanded')) {
+        if (icon) icon.style.transform = 'rotate(180deg)';
+        if (svg) svg.style.transform = 'rotate(180deg)';
+      } else {
+        if (icon) icon.style.transform = 'rotate(0deg)';
+        if (svg) svg.style.transform = 'rotate(0deg)';
+      }
+    }
+    
     setTimeout(initializeIcons, 10);
   }
 

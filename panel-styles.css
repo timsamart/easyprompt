@@ -296,16 +296,16 @@ h1::before {
 .card {
   background: var(--surface-color);
   border-radius: var(--radius-lg);
-  padding: var(--space-8);
+  padding: var(--space-6);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-light);
   transition: var(--transition);
   position: relative;
   overflow: hidden;
-  min-height: calc(160px * var(--scale-factor));
-  max-height: calc(220px * var(--scale-factor));
+  min-height: calc(140px * var(--scale-factor));
+  max-height: calc(200px * var(--scale-factor));
   display: flex;
-  gap: var(--space-6);
+  gap: var(--space-4);
 }
 
 .card::before {
@@ -340,18 +340,18 @@ h1::before {
 }
 
 .prompt-card .card-icon {
-  width: calc(32px * var(--scale-factor));
-  height: calc(32px * var(--scale-factor));
-  border-radius: var(--radius-md);
+  width: calc(28px * var(--scale-factor));
+  height: calc(28px * var(--scale-factor));
+  border-radius: var(--radius-sm);
   background: linear-gradient(135deg, var(--primary-light), #e0e7ff);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--space-4);
-  font-size: calc(16px * var(--scale-factor));
+  font-size: calc(14px * var(--scale-factor));
   color: var(--primary-color);
   border: 1px solid rgba(99, 102, 241, 0.2);
   box-shadow: var(--shadow-xs);
+  flex-shrink: 0;
 }
 
 /* Chain cards */
@@ -365,94 +365,60 @@ h1::before {
 }
 
 .chain-card .card-icon {
-  width: calc(32px * var(--scale-factor));
-  height: calc(32px * var(--scale-factor));
-  border-radius: var(--radius-md);
+  width: calc(28px * var(--scale-factor));
+  height: calc(28px * var(--scale-factor));
+  border-radius: var(--radius-sm);
   background: linear-gradient(135deg, #ede9fe, #ddd6fe);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--space-4);
-  font-size: calc(14px * var(--scale-factor));
+  font-size: calc(12px * var(--scale-factor));
   color: #8b5cf6;
   border: 1px solid rgba(139, 92, 246, 0.2);
   box-shadow: var(--shadow-xs);
   position: relative;
+  flex-shrink: 0;
 }
 
 .chain-card .step-dots {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: -4px;
+  right: -4px;
   background: #8b5cf6;
   color: white;
   border-radius: 50%;
-  width: calc(18px * var(--scale-factor));
-  height: calc(18px * var(--scale-factor));
+  width: calc(16px * var(--scale-factor));
+  height: calc(16px * var(--scale-factor));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px * var(--scale-factor));
+  font-size: calc(9px * var(--scale-factor));
   font-weight: 700;
   box-shadow: var(--shadow-sm);
-  border: 2px solid white;
-  min-width: calc(18px * var(--scale-factor));
-}
-
-/* Card content */
-.card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
-}
-
-.card-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.card-title {
-  font-size: var(--large-font-size);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--space-2);
-  line-height: 1.3;
-  letter-spacing: -0.025em;
-}
-
-.card-description {
-  font-size: var(--small-font-size);
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin-bottom: var(--space-6);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  flex: 1;
+  border: 1px solid white;
+  min-width: calc(16px * var(--scale-factor));
 }
 
 /* Card actions - vertical on left */
 .card-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
   padding: 0;
   border: none;
-  width: calc(32px * var(--scale-factor));
+  width: calc(28px * var(--scale-factor));
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .card-action-btn {
-  width: calc(32px * var(--scale-factor));
-  height: calc(32px * var(--scale-factor));
+  width: calc(28px * var(--scale-factor));
+  height: calc(28px * var(--scale-factor));
   padding: 0;
-  font-size: calc(14px * var(--scale-factor));
+  font-size: calc(12px * var(--scale-factor));
   font-weight: 600;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   background-color: var(--surface-color);
   color: var(--text-secondary);
@@ -462,6 +428,7 @@ h1::before {
   justify-content: center;
   text-transform: none;
   letter-spacing: 0;
+  box-shadow: var(--shadow-xs);
 }
 
 .card-action-btn:hover {
@@ -498,30 +465,33 @@ h1::before {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s ease;
-  margin-top: var(--space-4);
+  margin-top: var(--space-2);
   padding: 0;
+  border-radius: var(--radius-sm);
 }
 
 .chain-card.expanded .chain-steps {
-  max-height: calc(800px * var(--scale-factor)); /* Much larger to accommodate more steps */
-  padding: var(--space-4) 0;
+  max-height: calc(400px * var(--scale-factor));
+  padding: var(--space-2) 0;
 }
 
 .chain-step-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  margin-bottom: var(--space-2);
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-1);
   background: var(--border-light);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   cursor: pointer;
   transition: var(--transition);
   font-size: var(--small-font-size);
+  border: 1px solid transparent;
 }
 
 .chain-step-item:hover {
-  background: var(--border-color);
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.2);
   transform: translateX(2px);
 }
 
@@ -529,8 +499,8 @@ h1::before {
   background: #8b5cf6;
   color: white;
   border-radius: 50%;
-  width: calc(18px * var(--scale-factor));
-  height: calc(18px * var(--scale-factor));
+  width: calc(16px * var(--scale-factor));
+  height: calc(16px * var(--scale-factor));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -545,35 +515,51 @@ h1::before {
   font-weight: 500;
   line-height: 1.2;
   flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Expand button */
 .expand-btn {
   position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
+  top: var(--space-2);
+  right: var(--space-2);
   background: rgba(139, 92, 246, 0.1);
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 50%;
-  width: calc(24px * var(--scale-factor));
-  height: calc(24px * var(--scale-factor));
+  width: calc(28px * var(--scale-factor));
+  height: calc(28px * var(--scale-factor));
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   color: #8b5cf6;
   z-index: 10;
+  backdrop-filter: blur(4px);
 }
 
 .expand-btn:hover {
   background: rgba(139, 92, 246, 0.2);
   transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.expand-btn svg {
+  transition: transform 0.3s ease;
+  font-size: calc(14px * var(--scale-factor));
+  width: calc(14px * var(--scale-factor));
+  height: calc(14px * var(--scale-factor));
+}
+
+.chain-card.expanded .expand-btn svg {
+  transform: rotate(180deg);
 }
 
 .expand-btn i {
-  transition: var(--transition);
-  font-size: calc(12px * var(--scale-factor));
+  transition: transform 0.3s ease;
+  font-size: calc(14px * var(--scale-factor));
 }
 
 .chain-card.expanded .expand-btn i {
@@ -583,6 +569,46 @@ h1::before {
 /* Card main container positioning */
 .card-main {
   position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--space-2);
+}
+
+/* Card header optimization */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: var(--base-font-size);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.card-description {
+  font-size: var(--small-font-size);
+  color: var(--text-secondary);
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  flex: 1;
 }
 
 /* Responsive breakpoints */

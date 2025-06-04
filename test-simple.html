@@ -84,6 +84,21 @@
             const chain = document.getElementById('test-chain');
             chain.classList.toggle('expanded');
             
+            // Ensure icon rotation works properly
+            const expandBtn = chain.querySelector('.expand-btn');
+            if (expandBtn) {
+                const icon = expandBtn.querySelector('i');
+                const svg = expandBtn.querySelector('svg');
+                
+                if (chain.classList.contains('expanded')) {
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                    if (svg) svg.style.transform = 'rotate(180deg)';
+                } else {
+                    if (icon) icon.style.transform = 'rotate(0deg)';
+                    if (svg) svg.style.transform = 'rotate(0deg)';
+                }
+            }
+            
             // Re-initialize icons after toggle
             setTimeout(() => {
                 if (typeof feather !== 'undefined') {
