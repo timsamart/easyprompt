@@ -289,6 +289,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     const iconSVG = getPromptIcon(prompt.title, prompt.content);
     
     card.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon">${iconSVG}</div>
+        <div class="card-content">
+          <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
+          <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">Prompt • Ready to use</div>
+      </div>
       <div class="card-actions">
         <button class="card-action-btn primary" data-action="insert" data-id="${prompt.id}" title="Insert">
           <i data-feather="arrow-down"></i>
@@ -302,16 +312,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         <button class="card-action-btn danger" data-action="delete" data-id="${prompt.id}" title="Delete">
           <i data-feather="trash-2"></i>
         </button>
-      </div>
-      <div class="card-header">
-        <div class="card-icon">${iconSVG}</div>
-        <div class="card-content">
-          <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
-          <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-meta">Prompt • Ready to use</div>
       </div>
     `;
     
@@ -330,20 +330,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     const validSteps = chain.steps.filter(stepId => promptsMap.has(stepId));
     
     card.innerHTML = `
-      <div class="card-actions">
-        <button class="card-action-btn primary" data-action="start-chain" data-id="${chain.id}" title="Start Chain">
-          <i data-feather="play"></i>
-        </button>
-        <button class="card-action-btn success" data-action="copy-chain" data-id="${chain.id}" title="Copy All">
-          <i data-feather="copy"></i>
-        </button>
-        <button class="card-action-btn warning" data-action="edit" data-id="${chain.id}" title="Edit">
-          <i data-feather="edit-2"></i>
-        </button>
-        <button class="card-action-btn danger" data-action="delete" data-id="${chain.id}" title="Delete">
-          <i data-feather="trash-2"></i>
-        </button>
-      </div>
       <div class="card-header">
         <div class="card-icon">
           <i data-feather="link"></i>
@@ -371,6 +357,20 @@ document.addEventListener('DOMContentLoaded', async function() {
       <button class="expand-btn" data-action="toggle">
         <i data-feather="chevron-down"></i>
       </button>
+      <div class="card-actions">
+        <button class="card-action-btn primary" data-action="start-chain" data-id="${chain.id}" title="Start Chain">
+          <i data-feather="play"></i>
+        </button>
+        <button class="card-action-btn success" data-action="copy-chain" data-id="${chain.id}" title="Copy All">
+          <i data-feather="copy"></i>
+        </button>
+        <button class="card-action-btn warning" data-action="edit" data-id="${chain.id}" title="Edit">
+          <i data-feather="edit-2"></i>
+        </button>
+        <button class="card-action-btn danger" data-action="delete" data-id="${chain.id}" title="Delete">
+          <i data-feather="trash-2"></i>
+        </button>
+      </div>
     `;
     
     // Add event listeners
