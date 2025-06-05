@@ -336,8 +336,8 @@ h1::before {
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  min-height: calc(120px * var(--scale-factor));
-  max-height: calc(180px * var(--scale-factor));
+  min-height: calc(160px * var(--scale-factor));
+  max-height: calc(220px * var(--scale-factor));
   display: flex;
   flex-direction: column;
   transform: translateY(0);
@@ -475,10 +475,11 @@ h1::before {
 /* CARD BODY - Content Area */
 .card-body {
   flex: 1;
-  padding: 0 var(--space-6) var(--space-4) var(--space-6);
+  padding: 0 var(--space-6) var(--space-2) var(--space-6);
   display: flex;
   flex-direction: column;
-  min-height: calc(40px * var(--scale-factor));
+  justify-content: space-between;
+  min-height: calc(60px * var(--scale-factor));
 }
 
 .card-meta {
@@ -488,67 +489,182 @@ h1::before {
   font-weight: 500;
 }
 
-/* CARD ACTIONS - Bottom Right */
+/* CARD ACTIONS - Bottom Visible Design */
 .card-actions {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
+  position: relative;
   display: flex;
-  gap: var(--space-1);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6) var(--space-5) var(--space-6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.95));
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 0 0 calc(12px * var(--scale-factor)) calc(12px * var(--scale-factor));
+  margin-top: auto;
+  opacity: 1;
+  transition: all 0.2s ease;
 }
 
-.card:hover .card-actions {
-  opacity: 1;
+.card-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(99, 102, 241, 0.2) 20%, 
+    rgba(139, 92, 246, 0.2) 80%, 
+    transparent 100%);
+}
+
+.prompt-card .card-actions::before {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(99, 102, 241, 0.3) 50%, 
+    transparent 100%);
+}
+
+.chain-card .card-actions::before {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(139, 92, 246, 0.3) 50%, 
+    transparent 100%);
 }
 
 .card-action-btn {
-  width: calc(28px * var(--scale-factor));
-  height: calc(28px * var(--scale-factor));
+  width: calc(32px * var(--scale-factor));
+  height: calc(32px * var(--scale-factor));
   padding: 0;
-  font-size: calc(12px * var(--scale-factor));
+  font-size: calc(13px * var(--scale-factor));
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: calc(6px * var(--scale-factor));
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: calc(8px * var(--scale-factor));
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.9);
   color: var(--text-secondary);
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+  transition: left 0.5s ease;
+}
+
+.card-action-btn:hover::before {
+  left: 100%;
 }
 
 .card-action-btn:hover {
-  background-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 0.8);
 }
 
 .card-action-btn.primary {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
+  box-shadow: 
+    0 3px 8px rgba(99, 102, 241, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.card-action-btn.primary:hover {
+  box-shadow: 
+    0 5px 15px rgba(99, 102, 241, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .card-action-btn.success {
   background: linear-gradient(135deg, var(--success-color), var(--success-hover));
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
+  box-shadow: 
+    0 3px 8px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.card-action-btn.success:hover {
+  box-shadow: 
+    0 5px 15px rgba(16, 185, 129, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .card-action-btn.warning {
   background: linear-gradient(135deg, var(--warning-color), var(--warning-hover));
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
+  box-shadow: 
+    0 3px 8px rgba(245, 158, 11, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.card-action-btn.warning:hover {
+  box-shadow: 
+    0 5px 15px rgba(245, 158, 11, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .card-action-btn.danger {
   background: linear-gradient(135deg, var(--error-color), var(--error-hover));
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
+  box-shadow: 
+    0 3px 8px rgba(239, 68, 68, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.card-action-btn.danger:hover {
+  box-shadow: 
+    0 5px 15px rgba(239, 68, 68, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Action Button Labels - Tooltips */
+.card-action-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: var(--space-2) var(--space-3);
+  border-radius: calc(4px * var(--scale-factor));
+  font-size: calc(10px * var(--scale-factor));
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  animation: fadeInTooltip 0.2s ease 0.5s forwards;
+}
+
+@keyframes fadeInTooltip {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* EXPAND BUTTON - Redesigned */
