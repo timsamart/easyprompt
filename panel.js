@@ -303,14 +303,15 @@ document.addEventListener('DOMContentLoaded', async function() {
           <i data-feather="trash-2"></i>
         </button>
       </div>
-      <div class="card-main">
-        <div class="card-header">
-          <div class="card-icon">${iconSVG}</div>
-          <div class="card-content">
-            <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
-            <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
-          </div>
+      <div class="card-header">
+        <div class="card-icon">${iconSVG}</div>
+        <div class="card-content">
+          <h3 class="card-title">${SecurityUtils.escapeHtml(prompt.title)}</h3>
+          <p class="card-description">${SecurityUtils.escapeHtml(prompt.content)}</p>
         </div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">Prompt • Ready to use</div>
       </div>
     `;
     
@@ -343,20 +344,18 @@ document.addEventListener('DOMContentLoaded', async function() {
           <i data-feather="trash-2"></i>
         </button>
       </div>
-      <div class="card-main">
-        <button class="expand-btn" data-action="toggle">
-          <i data-feather="chevron-down"></i>
-        </button>
-        <div class="card-header">
-          <div class="card-icon">
-            <i data-feather="link"></i>
-            <div class="step-dots">${stepCount}</div>
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">${SecurityUtils.escapeHtml(chain.title)}</h3>
-            <p class="card-description">${stepCount} step${stepCount !== 1 ? 's' : ''} • Click to expand and view steps</p>
-          </div>
+      <div class="card-header">
+        <div class="card-icon">
+          <i data-feather="link"></i>
+          <div class="step-dots">${stepCount}</div>
         </div>
+        <div class="card-content">
+          <h3 class="card-title">${SecurityUtils.escapeHtml(chain.title)}</h3>
+          <p class="card-description">${stepCount} step${stepCount !== 1 ? 's' : ''} in this workflow</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">Chain • ${stepCount} step${stepCount !== 1 ? 's' : ''}</div>
         <div class="chain-steps">
           ${validSteps.map((stepId, index) => {
             const prompt = promptsMap.get(stepId);
@@ -369,6 +368,9 @@ document.addEventListener('DOMContentLoaded', async function() {
           }).join('')}
         </div>
       </div>
+      <button class="expand-btn" data-action="toggle">
+        <i data-feather="chevron-down"></i>
+      </button>
     `;
     
     // Add event listeners
