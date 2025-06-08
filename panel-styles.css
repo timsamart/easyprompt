@@ -493,7 +493,7 @@ h1::before {
 .card-actions {
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   gap: 8px;
   padding: 12px 16px 14px 16px;
