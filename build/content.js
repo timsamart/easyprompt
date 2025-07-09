@@ -1,5 +1,5 @@
 /**
- * Content script for PromptHub
+ * Content script for Local Prompt Chains Vault
  * Handles text insertion at cursor position with domain-specific selectors
  * Enhanced with error handling and security
  */
@@ -16,7 +16,7 @@ let feedbackTimeout = null;
 
 // Error logging for content script
 function logError(error, context = 'Content Script') {
-  console.error(`[PromptHub Content Error - ${context}]:`, error);
+  console.error(`[Local Prompt Chains Vault Content Error - ${context}]:`, error);
   
   // Send to background script for centralized logging
   try {
