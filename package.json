@@ -1,10 +1,11 @@
 {
-  "name": "easyprompt",
+  "name": "local-prompt-chains-vault",
   "version": "1.0.0",
-  "description": "easy prompt chain manager",
+  "description": "A privacy-first extension to manage local prompt chains securely on your device.",
   "main": "background.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "powershell -ExecutionPolicy Bypass -File ./prepare-package.ps1 && 7z a -tzip easyprompt.zip ./build/*"
   },
   "keywords": [],
   "author": "",

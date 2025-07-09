@@ -1,11 +1,11 @@
 /**
- * Background script for Local Prompt Chains Vault
+ * Background script for PromptHub
  * Handles context menu and extension state with enhanced error handling
  */
 
 // Error logging for background script
 function logError(error, context = 'Background') {
-  console.error(`[Local Prompt Chains Vault Background Error - ${context}]:`, error);
+  console.error(`[PromptHub Background Error - ${context}]:`, error);
 }
 
 function createError(message, code = 'GENERIC_ERROR') {
@@ -30,15 +30,15 @@ chrome.runtime.onInstalled.addListener(function() {
   try {
     // Create the parent menu item
     chrome.contextMenus.create({
-      id: 'prompt-vault-menu',
-      title: 'Local Prompt Chains Vault',
+      id: 'prompthub-menu',
+      title: 'PromptHub',
       contexts: ['editable']
     });
     
     // Create sub-menu item for managing prompts
     chrome.contextMenus.create({
       id: 'manage-prompts',
-      parentId: 'prompt-vault-menu',
+      parentId: 'prompthub-menu',
       title: 'Manage Prompts...',
       contexts: ['editable']
     });
@@ -46,15 +46,15 @@ chrome.runtime.onInstalled.addListener(function() {
     // Create a separator
     chrome.contextMenus.create({
       id: 'separator',
-      parentId: 'prompt-vault-menu',
+      parentId: 'prompthub-menu',
       type: 'separator',
       contexts: ['editable']
     });
     
     // Add new context menu item for opening the side panel
     chrome.contextMenus.create({
-      id: 'openPromptVault',
-      title: 'Open Local Prompt Chains Vault',
+      id: 'openPromptHub',
+      title: 'Open PromptHub',
       contexts: ['page', 'selection', 'editable']
     });
     
@@ -81,28 +81,28 @@ async function updateContextMenu() {
     
     // Recreate the base menu structure
     chrome.contextMenus.create({
-      id: 'prompt-vault-menu',
-      title: 'Local Prompt Chains Vault',
+      id: 'prompthub-menu',
+      title: 'PromptHub',
       contexts: ['editable']
     });
     
     chrome.contextMenus.create({
       id: 'manage-prompts',
-      parentId: 'prompt-vault-menu',
+      parentId: 'prompthub-menu',
       title: 'Manage Prompts...',
       contexts: ['editable']
     });
     
     chrome.contextMenus.create({
       id: 'separator',
-      parentId: 'prompt-vault-menu',
+      parentId: 'prompthub-menu',
       type: 'separator',
       contexts: ['editable']
     });
     
     chrome.contextMenus.create({
-      id: 'openPromptVault',
-      title: 'Open Local Prompt Chains Vault',
+      id: 'openPromptHub',
+      title: 'Open PromptHub',
       contexts: ['page', 'selection', 'editable']
     });
     
@@ -137,7 +137,7 @@ async function updateContextMenu() {
       try {
         chrome.contextMenus.create({
           id: 'prompt-' + prompt.id,
-          parentId: 'prompt-vault-menu',
+          parentId: 'prompthub-menu',
           title: prompt.title.length > 50 ? prompt.title.substring(0, 47) + '...' : prompt.title,
           contexts: ['editable']
         });
@@ -150,7 +150,7 @@ async function updateContextMenu() {
     if (validChains.length > 0) {
       chrome.contextMenus.create({
         id: 'chain-separator',
-        parentId: 'prompt-vault-menu',
+        parentId: 'prompthub-menu',
         type: 'separator',
         contexts: ['editable']
       });
@@ -162,7 +162,7 @@ async function updateContextMenu() {
       try {
         chrome.contextMenus.create({
           id: 'chain-' + chain.id,
-          parentId: 'prompt-vault-menu',
+          parentId: 'prompthub-menu',
           title: '⛓️ ' + (chain.title.length > 45 ? chain.title.substring(0, 42) + '...' : chain.title),
           contexts: ['editable']
         });
@@ -301,7 +301,7 @@ chrome.contextMenus.onClicked.addListener(async function(info, tab) {
     }
 
     // Handle opening the side panel
-    if (info.menuItemId === 'openPromptVault') {
+    if (info.menuItemId === 'openPromptHub') {
       if (!tab?.id) {
         throw createError('No valid tab found', 'NO_TAB');
       }

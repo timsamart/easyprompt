@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Local Prompt Chains Vault",
+    "name": "PromptHub",
     "version": "0.1.0",
-    "description": "Save and insert prompts and prompt chains at your cursor position. All data is stored locally.",
+    "description": "Save and insert prompts and prompt chains at your cursor position",
     "permissions": ["storage", "activeTab", "contextMenus", "sidePanel"],
     "action": {
       "default_icon": {
